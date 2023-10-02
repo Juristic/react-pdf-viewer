@@ -84,7 +84,7 @@ export interface SearchPlugin extends Plugin {
     ShowSearchPopover: (props: ShowSearchPopoverProps) => React.ReactElement;
     ShowSearchPopoverButton(): React.ReactElement;
     clearHighlights(): void;
-    highlight(keyword: SingleKeyword | SingleKeyword[]): Promise<Match[]>;
+    highlight(keyword: FlagKeyword | FlagKeyword[]): Promise<Match[]>;
     jumpToMatch(index: number): Match | null;
     jumpToNextMatch(): Match | null;
     jumpToPreviousMatch(): Match | null;
@@ -114,7 +114,7 @@ export interface RenderHighlightsProps {
 export interface SearchPluginProps {
     enableShortcuts?: boolean;
     // The keyword that will be highlighted in all pages
-    keyword?: SingleKeyword | SingleKeyword[];
+    keyword?: FlagKeyword | FlagKeyword[];
     renderHighlights?(props: RenderHighlightsProps): React.ReactElement;
     onHighlightKeyword?(props: OnHighlightKeyword): void;
 }

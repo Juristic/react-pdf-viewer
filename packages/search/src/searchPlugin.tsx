@@ -29,7 +29,7 @@ import { type NormalizedKeyword } from './types/NormalizedKeyword';
 import { type OnHighlightKeyword } from './types/OnHighlightKeyword';
 import { type RenderHighlightsProps } from './types/RenderHighlightsProps';
 import { type SearchTargetPageFilter } from './types/SearchTargetPage';
-import { type SingleKeyword } from './types/SingleKeyword';
+import { type FlagKeyword } from './types/FlagKeyword';
 import { type StoreProps } from './types/StoreProps';
 import { useSearch } from './useSearch';
 
@@ -38,7 +38,7 @@ export interface SearchPlugin extends Plugin {
     ShowSearchPopover(props: ShowSearchPopoverProps): React.ReactElement;
     ShowSearchPopoverButton(): React.ReactElement;
     clearHighlights(): void;
-    highlight(keyword: SingleKeyword | SingleKeyword[]): Promise<Match[]>;
+    highlight(keyword: FlagKeyword | FlagKeyword[]): Promise<Match[]>;
     jumpToMatch(index: number): Match | null;
     jumpToNextMatch(): Match | null;
     jumpToPreviousMatch(): Match | null;
@@ -48,12 +48,12 @@ export interface SearchPlugin extends Plugin {
 export interface SearchPluginProps {
     enableShortcuts?: boolean;
     // The keyword that will be highlighted in all pages
-    keyword?: SingleKeyword | SingleKeyword[];
+    keyword?: FlagKeyword | FlagKeyword[];
     renderHighlights?(props: RenderHighlightsProps): React.ReactElement;
     onHighlightKeyword?(props: OnHighlightKeyword): void;
 }
 
-const normalizeKeywords = (keyword?: SingleKeyword | SingleKeyword[]): NormalizedKeyword[] =>
+const normalizeKeywords = (keyword?: FlagKeyword | FlagKeyword[]): NormalizedKeyword[] =>
     Array.isArray(keyword) ? keyword.map((k) => normalizeSingleKeyword(k)) : [normalizeSingleKeyword(keyword)];
 
 export const searchPlugin = (props?: SearchPluginProps): SearchPlugin => {
@@ -156,7 +156,7 @@ export const searchPlugin = (props?: SearchPluginProps): SearchPlugin => {
         clearHighlights: () => {
             clearKeyword();
         },
-        highlight: (keyword: SingleKeyword | SingleKeyword[]) => {
+        highlight: (keyword: FlagKeyword | FlagKeyword[]) => {
             const keywords = Array.isArray(keyword) ? keyword : [keyword];
             setKeywords(keywords);
             return searchFor(keywords);
