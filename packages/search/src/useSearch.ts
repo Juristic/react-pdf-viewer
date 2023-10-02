@@ -14,7 +14,7 @@ import { EMPTY_KEYWORD_REGEXP } from './constants';
 import { normalizeSingleKeyword } from './normalizeKeyword';
 import { type Match } from './types/Match';
 import { type SearchTargetPageFilter } from './types/SearchTargetPage';
-import { type SingleKeyword } from './types/SingleKeyword';
+import { type FlagKeyword } from './types/FlagKeyword';
 import { type StoreProps } from './types/StoreProps';
 import { useDocument } from './useDocument';
 
@@ -28,17 +28,17 @@ export const useSearch = (
     jumpToMatch(index: number): Match | null;
     jumpToNextMatch(): Match | null;
     jumpToPreviousMatch(): Match | null;
-    keywords: SingleKeyword[];
+    keywords: FlagKeyword[];
     matchCase: boolean;
     numberOfMatches: number;
     wholeWords: boolean;
     search(): Promise<Match[]>;
-    setKeywords(keyword: SingleKeyword[]): void;
-    searchFor(keyword: SingleKeyword[], matchCase?: boolean, wholeWords?: boolean): Promise<Match[]>;
+    setKeywords(keyword: FlagKeyword[]): void;
+    searchFor(keyword: FlagKeyword[], matchCase?: boolean, wholeWords?: boolean): Promise<Match[]>;
     setTargetPages(targetPageFilter: SearchTargetPageFilter): void;
     // Compatible with the single keyword search
     keyword: string;
-    setKeyword(keyword: string): void;
+    setKeyword(keyword: FlagKeyword | FlagKeyword[]): void;
 } => {
     const initialKeyword = store.get('initialKeyword')!;
 
@@ -58,7 +58,7 @@ export const useSearch = (
     }, []);
 
     const currentDocRef = useDocument(store);
-    const [keywords, setKeywords] = React.useState<SingleKeyword[]>(initialKeyword);
+    const [keywords, setKeywords] = React.useState<FlagKeyword[]>(initialKeyword);
     const [found, setFound] = React.useState<Match[]>([]);
     const [currentMatch, setCurrentMatch] = React.useState(0);
     const [matchCase, setMatchCase] = React.useState(normalizedKeywordFlags.matchCase);
@@ -104,7 +104,7 @@ export const useSearch = (
     const clearKeyword = (): void => {
         store.update('keyword', [EMPTY_KEYWORD_REGEXP]);
 
-        setKeyword('');
+        setKeyword([]);
         setCurrentMatch(0);
         setFound([]);
         setMatchCase(false);
@@ -113,7 +113,8 @@ export const useSearch = (
 
     const search = () => searchFor(keywords, matchCase, wholeWords);
 
-    const setKeyword = (keyword: string) => setKeywords(keyword === '' ? [] : [keyword]);
+    const setKeyword = (keyword: FlagKeyword[] | FlagKeyword) =>
+        setKeywords(Array.isArray(keyword) ? keyword : [keyword]);
 
     const setTargetPages = (targetPageFilter: SearchTargetPageFilter) => {
         store.update('targetPageFilter', targetPageFilter);
@@ -161,7 +162,7 @@ export const useSearch = (
         return match;
     };
 
-    const getKeywordSource = (keyword: SingleKeyword): string => {
+    const getKeywordSource = (keyword: FlagKeyword): string => {
         if (keyword instanceof RegExp) {
             return keyword.source;
         }
@@ -172,7 +173,7 @@ export const useSearch = (
     };
 
     const searchFor = (
-        keywordParam: SingleKeyword[],
+        keywordParam: FlagKeyword[],
         matchCaseParam?: boolean,
         wholeWordsParam?: boolean,
     ): Promise<Match[]> => {
@@ -206,14 +207,27 @@ export const useSearch = (
                             let matchIndex = 0;
                             let matches: RegExpExecArray | null;
                             while ((matches = keyword.regExp.exec(pageText)) !== null) {
-                                arr.push({
-                                    keyword: keyword.regExp,
-                                    matchIndex,
-                                    pageIndex,
-                                    pageText,
-                                    startIndex: matches.index,
-                                    endIndex: keyword.regExp.lastIndex,
-                                });
+                                if (keyword.indexes) {
+                                    if (keyword.indexes.includes(matchIndex)) {
+                                        arr.push({
+                                            keyword: keyword.regExp,
+                                            matchIndex,
+                                            pageIndex,
+                                            pageText,
+                                            startIndex: matches.index,
+                                            endIndex: keyword.regExp.lastIndex,
+                                        });
+                                    }
+                                } else {
+                                    arr.push({
+                                        keyword: keyword.regExp,
+                                        matchIndex,
+                                        pageIndex,
+                                        pageText,
+                                        startIndex: matches.index,
+                                        endIndex: keyword.regExp.lastIndex,
+                                    });
+                                }
                                 matchIndex++;
                             }
                         });

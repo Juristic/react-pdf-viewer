@@ -14,6 +14,7 @@ import { type Match } from './types/Match';
 import { type SearchTargetPageFilter } from './types/SearchTargetPage';
 import { type StoreProps } from './types/StoreProps';
 import { useSearch } from './useSearch';
+import { type FlagKeyword } from './types/FlagKeyword';
 
 export interface RenderSearchProps {
     clearKeyword(): void;
@@ -29,7 +30,7 @@ export interface RenderSearchProps {
     numberOfMatches: number;
     wholeWords: boolean;
     search(): Promise<Match[]>;
-    setKeyword(keyword: string): void;
+    setKeyword(keyword: FlagKeyword | FlagKeyword[]): void;
     setTargetPages(targetPageFilter: SearchTargetPageFilter): void;
 }
 
