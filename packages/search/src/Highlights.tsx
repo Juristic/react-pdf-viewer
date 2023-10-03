@@ -183,6 +183,7 @@ export const Highlights: React.FC<{
             let match;
             const matches: MatchIndexes[] = [];
             while ((match = cloneKeyword.exec(fullText)) !== null) {
+                console.log(match);
                 matches.push({
                     keyword: cloneKeyword,
                     startIndex: match.index as number,

@@ -31,9 +31,9 @@ import { type NormalizedKeyword } from './types/NormalizedKeyword';
 import { type OnHighlightKeyword } from './types/OnHighlightKeyword';
 import { type RenderHighlightsProps } from './types/RenderHighlightsProps';
 import { type SearchTargetPageFilter } from './types/SearchTargetPage';
-import { type FlagKeyword } from './types/FlagKeyword';
 import { type StoreProps } from './types/StoreProps';
 import { useSearch } from './useSearch';
+import { FlagKeyword } from './types/FlagKeyword';
 
 export interface SearchPlugin extends Plugin {
     Search(props: SearchProps): React.ReactElement;

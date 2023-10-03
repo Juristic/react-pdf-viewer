@@ -10,12 +10,12 @@ import { type Destination, type PdfJs, type PluginOnTextLayerRender } from '@rea
 import { type MatchPosition } from './MatchPosition';
 import { type NormalizedKeyword } from './NormalizedKeyword';
 import { type SearchTargetPageFilter } from './SearchTargetPage';
-import { type FlagKeyword } from './FlagKeyword';
+import { SingleKeyword } from './SingleKeyword';
 
 export interface StoreProps {
     areShortcutsPressed?: boolean;
     doc?: PdfJs.PdfDocument;
-    initialKeyword?: FlagKeyword[];
+    initialKeyword?: SingleKeyword[];
     keyword?: NormalizedKeyword[];
     matchPosition: MatchPosition;
     renderStatus: Map<number, PluginOnTextLayerRender>;

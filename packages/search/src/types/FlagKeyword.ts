@@ -8,7 +8,7 @@
 
 export interface FlagKeyword {
     keyword: string;
-    indexes?: number[];
     matchCase?: boolean; // `false` by default
     wholeWords?: boolean; // `false` by default
+    indexes?: { [pageIndex: string | number]: number[] }; // `{}` by default
 }

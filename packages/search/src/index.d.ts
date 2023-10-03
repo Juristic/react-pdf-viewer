@@ -14,6 +14,7 @@ export interface FlagKeyword {
     keyword: string;
     matchCase?: boolean; // `false` by default
     wholeWords?: boolean; // `false` by default
+    indexes?: { [pageIndex: string | number]: number[] }; // `{}` by default
 }
 
 export interface Match {
@@ -84,7 +85,7 @@ export interface SearchPlugin extends Plugin {
     ShowSearchPopover: (props: ShowSearchPopoverProps) => React.ReactElement;
     ShowSearchPopoverButton(): React.ReactElement;
     clearHighlights(): void;
-    highlight(keyword: FlagKeyword | FlagKeyword[]): Promise<Match[]>;
+    highlight(keyword: SingleKeyword | SingleKeyword[]): Promise<Match[]>;
     jumpToMatch(index: number): Match | null;
     jumpToNextMatch(): Match | null;
     jumpToPreviousMatch(): Match | null;
@@ -114,7 +115,7 @@ export interface RenderHighlightsProps {
 export interface SearchPluginProps {
     enableShortcuts?: boolean;
     // The keyword that will be highlighted in all pages
-    keyword?: FlagKeyword | FlagKeyword[];
+    keyword?: SingleKeyword | SingleKeyword[];
     renderHighlights?(props: RenderHighlightsProps): React.ReactElement;
     onHighlightKeyword?(props: OnHighlightKeyword): void;
 }

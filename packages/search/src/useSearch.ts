@@ -14,9 +14,9 @@ import { EMPTY_KEYWORD_REGEXP } from './constants';
 import { normalizeSingleKeyword } from './normalizeKeyword';
 import { type Match } from './types/Match';
 import { type SearchTargetPageFilter } from './types/SearchTargetPage';
-import { type FlagKeyword } from './types/FlagKeyword';
 import { type StoreProps } from './types/StoreProps';
 import { useDocument } from './useDocument';
+import { SingleKeyword } from './types/SingleKeyword';
 
 export const useSearch = (
     store: Store<StoreProps>,
@@ -28,17 +28,17 @@ export const useSearch = (
     jumpToMatch(index: number): Match | null;
     jumpToNextMatch(): Match | null;
     jumpToPreviousMatch(): Match | null;
-    keywords: FlagKeyword[];
+    keywords: SingleKeyword[];
     matchCase: boolean;
     numberOfMatches: number;
     wholeWords: boolean;
     search(): Promise<Match[]>;
-    setKeywords(keyword: FlagKeyword[]): void;
-    searchFor(keyword: FlagKeyword[], matchCase?: boolean, wholeWords?: boolean): Promise<Match[]>;
+    setKeywords(keyword: SingleKeyword[]): void;
+    searchFor(keyword: SingleKeyword[], matchCase?: boolean, wholeWords?: boolean): Promise<Match[]>;
     setTargetPages(targetPageFilter: SearchTargetPageFilter): void;
     // Compatible with the single keyword search
     keyword: string;
-    setKeyword(keyword: FlagKeyword | FlagKeyword[]): void;
+    setKeyword(keyword: SingleKeyword | SingleKeyword[]): void;
 } => {
     const initialKeyword = store.get('initialKeyword')!;
 
@@ -58,7 +58,7 @@ export const useSearch = (
     }, []);
 
     const currentDocRef = useDocument(store);
-    const [keywords, setKeywords] = React.useState<FlagKeyword[]>(initialKeyword);
+    const [keywords, setKeywords] = React.useState<SingleKeyword[]>(initialKeyword);
     const [found, setFound] = React.useState<Match[]>([]);
     const [currentMatch, setCurrentMatch] = React.useState(0);
     const [matchCase, setMatchCase] = React.useState(normalizedKeywordFlags.matchCase);
@@ -113,7 +113,7 @@ export const useSearch = (
 
     const search = () => searchFor(keywords, matchCase, wholeWords);
 
-    const setKeyword = (keyword: FlagKeyword[] | FlagKeyword) =>
+    const setKeyword = (keyword: SingleKeyword[] | SingleKeyword) =>
         setKeywords(Array.isArray(keyword) ? keyword : [keyword]);
 
     const setTargetPages = (targetPageFilter: SearchTargetPageFilter) => {
@@ -162,7 +162,7 @@ export const useSearch = (
         return match;
     };
 
-    const getKeywordSource = (keyword: FlagKeyword): string => {
+    const getKeywordSource = (keyword: SingleKeyword): string => {
         if (keyword instanceof RegExp) {
             return keyword.source;
         }
@@ -173,7 +173,7 @@ export const useSearch = (
     };
 
     const searchFor = (
-        keywordParam: FlagKeyword[],
+        keywordParam: SingleKeyword[],
         matchCaseParam?: boolean,
         wholeWordsParam?: boolean,
     ): Promise<Match[]> => {
@@ -183,7 +183,15 @@ export const useSearch = (
         }
 
         const numPages = currentDoc.numPages;
-        const keywords = keywordParam.map((k) => normalizeSingleKeyword(k, matchCaseParam, wholeWordsParam));
+        const keywords = keywordParam.map((k) =>
+            normalizeSingleKeyword(
+                k,
+                matchCaseParam,
+                wholeWordsParam,
+                k instanceof Object && 'indexes' in k ? k.indexes : undefined,
+            ),
+        );
+
         store.update('keyword', keywords);
 
         setCurrentMatch(0);
@@ -207,8 +215,8 @@ export const useSearch = (
                             let matchIndex = 0;
                             let matches: RegExpExecArray | null;
                             while ((matches = keyword.regExp.exec(pageText)) !== null) {
-                                if (keyword.indexes) {
-                                    if (keyword.indexes.includes(matchIndex)) {
+                                if (Object.keys(keyword.indexes || {}).length > 0) {
+                                    if (keyword.indexes[pageIndex]?.includes(matchIndex)) {
                                         arr.push({
                                             keyword: keyword.regExp,
                                             matchIndex,
