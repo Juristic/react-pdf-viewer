@@ -77,6 +77,7 @@ export const searchPlugin = (props?: SearchPluginProps): SearchPlugin => {
                 matchPosition: {
                     matchIndex: -1,
                     pageIndex: -1,
+                    title: '',
                 },
                 renderStatus: new Map<number, PluginOnTextLayerRender>(),
             }),

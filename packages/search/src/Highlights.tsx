@@ -71,7 +71,12 @@ export const Highlights: React.FC<{
         (renderProps: RenderHighlightsProps) => (
             <>
                 {renderProps.highlightAreas.map((area, index) => (
-                    <HightlightItem index={index} key={index} area={area} onHighlightKeyword={onHighlightKeyword} />
+                    <HightlightItem
+                        index={area.index}
+                        key={index}
+                        area={area}
+                        onHighlightKeyword={onHighlightKeyword}
+                    />
                 ))}
             </>
         ),
@@ -106,6 +111,7 @@ export const Highlights: React.FC<{
         textLayerEle: Element,
         span: HTMLElement,
         charIndexSpan: CharIndex[],
+        index: number,
     ): HighlightArea | null => {
         const range = document.createRange();
 
@@ -151,6 +157,7 @@ export const Highlights: React.FC<{
             width,
             pageHeight,
             pageWidth,
+            index,
         };
     };
 
@@ -183,7 +190,6 @@ export const Highlights: React.FC<{
             let match;
             const matches: MatchIndexes[] = [];
             while ((match = cloneKeyword.exec(fullText)) !== null) {
-                console.log(match);
                 matches.push({
                     keyword: cloneKeyword,
                     startIndex: match.index as number,
@@ -192,11 +198,21 @@ export const Highlights: React.FC<{
             }
 
             matches
-                .map((item) => ({
-                    keyword: item.keyword,
-                    indexes: charIndexes.slice(item.startIndex, item.endIndex),
-                }))
-                .forEach((item) => {
+
+                .map((item, i) => {
+                    const returnValue = {
+                        keyword: item.keyword,
+                        indexes: charIndexes.slice(item.startIndex, item.endIndex),
+                    };
+
+                    return Object.keys(keyword.indexes).length > 0
+                        ? keyword.indexes[pageIndex]?.includes(i)
+                            ? returnValue
+                            : null
+                        : returnValue;
+                })
+                .forEach((item, i) => {
+                    if (!item) return;
                     // Group by the span index
                     const spanIndexes = item.indexes.reduce(
                         (acc, item) => {
@@ -216,6 +232,7 @@ export const Highlights: React.FC<{
                                 textLayerEle,
                                 spans[normalizedCharSpan[0].spanIndex],
                                 normalizedCharSpan,
+                                i,
                             );
                             if (hightlighPosition) {
                                 highlightPos.push(hightlighPosition);
@@ -330,7 +347,10 @@ export const Highlights: React.FC<{
             return;
         }
 
-        const highlightEle = container.querySelector(`.${styles.highlight}[data-index="${matchPosition.matchIndex}"]`);
+        const highlightEle = container.querySelector(
+            `.${styles.highlight}[data-index="${matchPosition.matchIndex}"][title="${matchPosition.title}"]`,
+        );
+
         if (!highlightEle) {
             return;
         }
