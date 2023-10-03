@@ -91,6 +91,7 @@ export const useSearch = (
 
         // Make sure that the `index` is in the range of 1 and `numMatches`
         const normalizedIndex = index === numMatches + 1 ? 1 : Math.max(1, Math.min(numMatches, index));
+
         setCurrentMatch(normalizedIndex);
         return jumpToGivenMatch(found[normalizedIndex - 1]);
     };
@@ -156,6 +157,7 @@ export const useSearch = (
         store.update('matchPosition', {
             matchIndex: match.matchIndex,
             pageIndex: match.pageIndex,
+            title: match.original,
         });
         return match;
     };
@@ -217,6 +219,7 @@ export const useSearch = (
                                     if (keyword.indexes[pageIndex]?.includes(matchIndex)) {
                                         arr.push({
                                             keyword: keyword.regExp,
+                                            original: keyword.keyword,
                                             matchIndex,
                                             pageIndex,
                                             pageText,
@@ -227,6 +230,7 @@ export const useSearch = (
                                 } else {
                                     arr.push({
                                         keyword: keyword.regExp,
+                                        original: keyword.keyword,
                                         matchIndex,
                                         pageIndex,
                                         pageText,
