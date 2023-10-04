@@ -335,11 +335,16 @@ export const Highlights: React.FC<{
         }
 
         const container = containerRef.current;
+
         if (
             matchPosition.pageIndex !== pageIndex ||
             !container ||
             renderStatus.status !== LayerRenderStatus.DidRender
         ) {
+            if (currentMatchRef.current) {
+                currentMatchRef.current.forEach((el) => el.classList.remove('rpv-search__highlight--current'));
+                currentMatchRef.current = null;
+            }
             return;
         }
 
