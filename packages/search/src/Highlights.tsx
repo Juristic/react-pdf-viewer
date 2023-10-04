@@ -95,7 +95,7 @@ export const Highlights: React.FC<{
         scale: 1,
         status: LayerRenderStatus.PreRender,
     });
-    const currentMatchRef = React.useRef<HTMLElement | null>(null);
+    const currentMatchRef = React.useRef<NodeListOf<HTMLElement> | null>(null);
     const characterIndexesRef = React.useRef<CharIndex[]>([]);
     const [highlightAreas, setHighlightAreas] = React.useState<HighlightArea[]>([]);
 
@@ -347,15 +347,15 @@ export const Highlights: React.FC<{
             return;
         }
 
-        const highlightEle = container.querySelector(
+        const highlightEls: NodeListOf<HTMLElement> = container.querySelectorAll(
             `.${styles.highlight}[data-index="${matchPosition.matchIndex}"][title="${matchPosition.title}"]`,
         );
 
-        if (!highlightEle) {
+        if (!highlightEls || highlightEls.length === 0) {
             return;
         }
 
-        const { left, top } = calculateOffset(highlightEle as HTMLElement, container);
+        const { left, top } = calculateOffset(highlightEls.item(0), container);
         const jump = store.get('jumpToDestination');
         if (jump) {
             jump({
@@ -365,10 +365,10 @@ export const Highlights: React.FC<{
                 scaleTo: renderStatus.scale,
             });
             if (currentMatchRef.current) {
-                currentMatchRef.current.classList.remove(styles.highlightCurrent);
+                currentMatchRef.current.forEach((el) => el.classList.remove(styles.highlightCurrent));
             }
-            currentMatchRef.current = highlightEle as HTMLElement;
-            highlightEle.classList.add(styles.highlightCurrent);
+            currentMatchRef.current = highlightEls;
+            highlightEls.forEach((el) => el.classList.add(styles.highlightCurrent));
         }
     }, [highlightAreas, matchPosition]);
 
