@@ -6,7 +6,7 @@
  * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
-import { type Plugin } from '@react-pdf-viewer/core';
+import type { Plugin, Store, PluginOnTextLayerRender, Destination, PdfJs } from '@react-pdf-viewer/core';
 import * as React from 'react';
 
 // Types
@@ -78,6 +78,24 @@ export interface SearchProps {
 export interface ShowSearchPopoverProps {
     children?: (props: RenderShowSearchPopoverProps) => React.ReactElement;
 }
+export interface NormalizedKeyword {
+    keyword: string;
+    regExp: RegExp;
+    wholeWords: boolean;
+    indexes: { [pageIndex: string | number]: number[] };
+}
+
+export interface StoreProps {
+    areShortcutsPressed?: boolean;
+    doc?: PdfJs.PdfDocument;
+    initialKeyword?: SingleKeyword[];
+    keyword?: NormalizedKeyword[];
+    matchPosition: MatchPosition;
+    renderStatus: Map<number, PluginOnTextLayerRender>;
+    jumpToDestination?(destination: Destination): void;
+    jumpToPage?(pageIndex: number): void;
+    targetPageFilter?: SearchTargetPageFilter;
+}
 
 // Plugin
 export interface SearchPlugin extends Plugin {
@@ -90,6 +108,7 @@ export interface SearchPlugin extends Plugin {
     jumpToNextMatch(): Match | null;
     jumpToPreviousMatch(): Match | null;
     setTargetPages(targetPageFilter: SearchTargetPageFilter): void;
+    store: Store<StoreProps>;
 }
 
 export interface HighlightArea {
