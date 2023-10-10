@@ -8,7 +8,6 @@
 
 import {
     createStore,
-    Store,
     type Plugin,
     type PluginFunctions,
     type PluginOnDocumentLoad,
@@ -44,7 +43,6 @@ export interface SearchPlugin extends Plugin {
     jumpToNextMatch(): Match | null;
     jumpToPreviousMatch(): Match | null;
     setTargetPages(targetPageFilter: SearchTargetPageFilter): void;
-    store: Store<StoreProps>;
 }
 
 export interface SearchPluginProps {
@@ -79,7 +77,6 @@ export const searchPlugin = (props?: SearchPluginProps): SearchPlugin => {
             }),
         [],
     );
-
     const { clearKeyword, jumpToMatch, jumpToNextMatch, jumpToPreviousMatch, searchFor, setKeywords, setTargetPages } =
         useSearch(store);
 
@@ -169,6 +166,5 @@ export const searchPlugin = (props?: SearchPluginProps): SearchPlugin => {
         jumpToNextMatch,
         jumpToPreviousMatch,
         setTargetPages,
-        store,
     };
 };
