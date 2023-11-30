@@ -1,13 +1,8 @@
 {
-    "name": "@react-pdf-viewer/highlight",
-    "version": "3.12.0",
-    "description": "A React component to view a PDF document",
+    "name": "@juristic/react-pdf-viewer-highlight",
+    "version": "3.12.1",
+    "description": "Highlight Plugin for React-pdf-viewer",
     "license": "https://react-pdf-viewer.dev/license",
-    "author": {
-        "name": "Nguyen Huu Phuoc",
-        "email": "me@phuoc.ng",
-        "url": "https://twitter.com/nghuuphuoc"
-    },
     "homepage": "https://react-pdf-viewer.dev",
     "keywords": [
         "react",
@@ -48,5 +43,17 @@
         "js": "cp src/index.d.ts lib && cp dist/index.js lib && rollup -c ../../rollup.config.cjs",
         "css": "sass --no-source-map --style compressed src/styles/index.scss lib/styles/index.css",
         "release": "npm publish --access public"
-    }
+    },
+    "contributors": [
+        {
+            "name": "Nguyen Huu Phuoc",
+            "email": "me@phuoc.ng",
+            "url": "https://twitter.com/nghuuphuoc"
+        },
+        {
+            "name": "isimisi",
+            "email": "ia@juristic.io",
+            "url": "https://github.com/isimisi"
+        }
+    ]
 }
