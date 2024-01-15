@@ -6,22 +6,31 @@
  * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
-export const getRectFromOffsets = (textDiv: HTMLElement, startOffset: number, endOffset: number): DOMRect => {
+export const getRectFromOffsets = (textDiv: HTMLElement, startOffset: number, endOffset: number): DOMRect | null => {
     const clonedEle = textDiv.cloneNode(true);
-    textDiv.parentNode.appendChild(clonedEle);
 
-    const firstChild = clonedEle.firstChild;
-    const range = new Range();
-    range.setStart(firstChild, startOffset);
-    range.setEnd(firstChild, endOffset);
+    try {
+        textDiv.parentNode.appendChild(clonedEle);
 
-    const wrapper = document.createElement('span');
-    range.surroundContents(wrapper);
+        const firstChild = clonedEle.firstChild;
+        const range = new Range();
+        range.setStart(firstChild, startOffset);
+        range.setEnd(firstChild, endOffset);
 
-    const rect = wrapper.getBoundingClientRect();
+        const wrapper = document.createElement('span');
+        range.surroundContents(wrapper);
 
-    // Remove the clone element
-    clonedEle.parentNode.removeChild(clonedEle);
+        const rect = wrapper.getBoundingClientRect();
 
-    return rect;
+        // Remove the clone element
+        clonedEle.parentNode.removeChild(clonedEle);
+
+        return rect;
+    } catch (error) {
+        if (error instanceof DOMException && error.name === 'IndexSizeError') {
+            clonedEle.parentNode.removeChild(clonedEle);
+            return null;
+        }
+        throw error;
+    }
 };
