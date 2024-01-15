@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 export { Viewer } from './Viewer';
 export { Worker } from './Worker';
@@ -28,6 +30,7 @@ export { useIsMounted } from './hooks/useIsMounted';
 export { useIsomorphicLayoutEffect } from './hooks/useIsomorphicLayoutEffect';
 export { usePrevious } from './hooks/usePrevious';
 export { useRenderQueue, type UseRenderQueue } from './hooks/useRenderQueue';
+export { useSafeState } from './hooks/useSafeState';
 export { Icon } from './icons/Icon';
 export { LocalizationContext } from './localization/LocalizationContext';
 export { Modal } from './portal/Modal';
@@ -50,4 +53,5 @@ export { chunk } from './utils/chunk';
 export { classNames } from './utils/classNames';
 export { isMac } from './utils/isMac';
 export { getDestination, getPage } from './utils/managePages';
+export { mergeRefs } from './utils/mergeRefs';
 export { PdfJsApiContext } from './vendors/PdfJsApiContext';

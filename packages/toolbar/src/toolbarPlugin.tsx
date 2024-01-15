@@ -3,19 +3,12 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
-import {
-    type Plugin,
-    type PluginFunctions,
-    type PluginOnAnnotationLayerRender,
-    type PluginOnDocumentLoad,
-    type PluginOnTextLayerRender,
-    type PluginRenderPageLayer,
-    type RenderViewer,
-    type ViewerState,
-} from '@react-pdf-viewer/core';
+'use client';
+
+import { type Plugin } from '@react-pdf-viewer/core';
 import { fullScreenPlugin, type FullScreenPlugin, type FullScreenPluginProps } from '@react-pdf-viewer/full-screen';
 import { getFilePlugin, type GetFilePlugin, type GetFilePluginProps } from '@react-pdf-viewer/get-file';
 import { openPlugin, type OpenPlugin, type OpenPluginProps } from '@react-pdf-viewer/open';
@@ -192,72 +185,7 @@ export const toolbarPlugin = (props?: ToolbarPluginProps): ToolbarPlugin => {
         selectionModePluginInstance,
         themePluginInstance,
         zoomPluginInstance,
-        install: (pluginFunctions: PluginFunctions) => {
-            // Install plugins
-            plugins.forEach((plugin) => {
-                if (plugin.install) {
-                    plugin.install(pluginFunctions);
-                }
-            });
-        },
-        renderPageLayer: (renderProps: PluginRenderPageLayer) => (
-            <React.Fragment>
-                {plugins.map((plugin, idx) =>
-                    plugin.renderPageLayer ? (
-                        <React.Fragment key={idx}>{plugin.renderPageLayer(renderProps)}</React.Fragment>
-                    ) : (
-                        <React.Fragment key={idx}></React.Fragment>
-                    ),
-                )}
-            </React.Fragment>
-        ),
-        renderViewer: (props: RenderViewer) => {
-            let { slot } = props;
-            plugins.forEach((plugin) => {
-                if (plugin.renderViewer) {
-                    slot = plugin.renderViewer({ ...props, slot });
-                }
-            });
-            return slot;
-        },
-        uninstall: (pluginFunctions: PluginFunctions) => {
-            // Unistall plugins
-            plugins.forEach((plugin) => {
-                if (plugin.uninstall) {
-                    plugin.uninstall(pluginFunctions);
-                }
-            });
-        },
-        onDocumentLoad: (props: PluginOnDocumentLoad) => {
-            plugins.forEach((plugin) => {
-                if (plugin.onDocumentLoad) {
-                    plugin.onDocumentLoad(props);
-                }
-            });
-        },
-        onAnnotationLayerRender: (props: PluginOnAnnotationLayerRender) => {
-            plugins.forEach((plugin) => {
-                if (plugin.onAnnotationLayerRender) {
-                    plugin.onAnnotationLayerRender(props);
-                }
-            });
-        },
-        onTextLayerRender: (props: PluginOnTextLayerRender) => {
-            plugins.forEach((plugin) => {
-                if (plugin.onTextLayerRender) {
-                    plugin.onTextLayerRender(props);
-                }
-            });
-        },
-        onViewerStateChange: (viewerState: ViewerState) => {
-            let newState = viewerState;
-            plugins.forEach((plugin) => {
-                if (plugin.onViewerStateChange) {
-                    newState = plugin.onViewerStateChange(newState);
-                }
-            });
-            return newState;
-        },
+        dependencies: plugins,
         renderDefaultToolbar,
         Toolbar: ToolbarDecorator,
     };

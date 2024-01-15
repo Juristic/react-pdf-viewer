@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import * as React from 'react';
 import { usePrevious } from '../hooks/usePrevious';
@@ -35,8 +37,10 @@ export const withTheme = (theme: string, onSwitchTheme?: (theme: string) => void
     }, []);
 
     React.useEffect(() => {
-        if (currentTheme !== prevTheme && onSwitchTheme) {
-            onSwitchTheme(currentTheme);
+        document.documentElement.classList.add(`rpv--${currentTheme}`);
+        if (currentTheme !== prevTheme) {
+            document.documentElement.classList.remove(`rpv--${prevTheme}`);
+            onSwitchTheme && onSwitchTheme(currentTheme);
         }
     }, [currentTheme]);
 

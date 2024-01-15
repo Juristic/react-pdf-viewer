@@ -3,14 +3,14 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
 $rpv-default-layout-toolbar-height: 2.5rem;
 
 .rpv-default-layout__container {
     /* Border */
-    border: 1px solid var(--rpv-default-layout__container-border-color);
+    border: 1px solid var(--rpv-core-border-color);
     box-sizing: border-box;
 
     /* Full size */
@@ -21,7 +21,7 @@ $rpv-default-layout-toolbar-height: 2.5rem;
 .rpv-default-layout__toolbar {
     align-items: center;
     background-color: var(--rpv-default-layout__toolbar-background-color);
-    border-bottom: 1px solid var(--rpv-default-layout__toolbar-border-bottom-color);
+    border-bottom: 1px solid var(--rpv-core-border-color);
     display: flex;
 
     /* Postion */
@@ -48,7 +48,7 @@ $rpv-default-layout-toolbar-height: 2.5rem;
         position: absolute;
         top: 0;
 
-        /* Size */         
+        /* Size */
         width: 12rem;
 
         /* Display it on top of pages */
@@ -57,10 +57,10 @@ $rpv-default-layout-toolbar-height: 2.5rem;
     }
 
     &--ltr {
-        border-right: 1px solid var(--rpv-default-layout__sidebar-border-color);
+        border-right: 1px solid var(--rpv-core-border-color);
     }
     &--rtl {
-        border-left: 1px solid var(--rpv-default-layout__sidebar-border-color);
+        border-left: 1px solid var(--rpv-core-border-color);
     }
 }
 

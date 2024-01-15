@@ -3,7 +3,7 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
 .rpv-core__tooltip-body {
@@ -12,9 +12,9 @@
     color: var(--rpv-core__tooltip-body-color);
     left: 0;
     max-width: 20rem;
-    position: absolute;
+    position: fixed;
     text-align: center;
-    top: -9999px;
+    top: 0;
     z-index: 9999;
 
     &--rtl {

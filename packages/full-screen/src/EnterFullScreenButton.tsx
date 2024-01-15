@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import {
     isFullScreenEnabled,
@@ -17,8 +19,6 @@ import {
 } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { FullScreenIcon } from './FullScreenIcon';
-
-const TOOLTIP_OFFSET = { left: 0, top: 8 };
 
 export const EnterFullScreenButton: React.FC<{
     enableShortcuts: boolean;
@@ -45,7 +45,6 @@ export const EnterFullScreenButton: React.FC<{
                 </MinimalButton>
             }
             content={() => label}
-            offset={TOOLTIP_OFFSET}
         />
     );
 };

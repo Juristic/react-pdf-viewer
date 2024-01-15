@@ -3,14 +3,15 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import * as React from 'react';
 import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 import { useWindowResize } from '../hooks/useWindowResize';
 import { FullScreenMode } from '../structs/FullScreenMode';
-import { ScrollMode } from '../structs/ScrollMode';
 import { type Rect } from '../types/Rect';
 import {
     addFullScreenChangeListener,
@@ -26,22 +27,15 @@ const ZERO_RECT = {
     width: 0,
 };
 
-export const useFullScreen = ({
-    getCurrentPage,
-    getCurrentScrollMode,
-    jumpToPage,
-    targetRef,
-}: {
-    getCurrentPage: () => number;
-    getCurrentScrollMode: () => ScrollMode;
-    jumpToPage: (pageIndex: number) => Promise<void>;
-    targetRef: React.MutableRefObject<HTMLElement>;
-}) => {
+const EPSILON = 2;
+
+const equal = (a: number, b: number) => Math.abs(a - b) <= EPSILON;
+
+export const useFullScreen = ({ targetRef }: { targetRef: React.MutableRefObject<HTMLElement> }) => {
     const [fullScreenMode, setFullScreenMode] = React.useState(FullScreenMode.Normal);
     const windowRect = useWindowResize();
     const [targetRect, setTargetRect] = React.useState<Rect>(ZERO_RECT);
     const windowSizeBeforeFullScreenRef = React.useRef<Rect>(ZERO_RECT);
-    const targetPageRef = React.useRef(getCurrentPage());
 
     const fullScreenSizeRef = React.useRef<Rect>(ZERO_RECT);
     const [element, setElement] = React.useState<HTMLElement>(targetRef.current);
@@ -60,8 +54,12 @@ export const useFullScreen = ({
         }
         const io = new ResizeObserver((entries) => {
             entries.forEach((entry) => {
-                const { height, width } = entry.target.getBoundingClientRect();
-                setTargetRect({ height, width });
+                // Always use `clientHeight` instead of the bounding rect (`getBoundingClientRect().height`) because they aren't the same
+                // Causing the comparison with the `window.innerHeight` doesn't work properly
+                setTargetRect({
+                    height: entry.target.clientHeight,
+                    width: entry.target.clientWidth,
+                });
             });
         });
         io.observe(element);
@@ -122,7 +120,6 @@ export const useFullScreen = ({
                         'var(--rpv-core__full-screen-target-background-color)';
                 }
                 // Store the latest window size right after entering the full screen mode
-                targetPageRef.current = getCurrentPage();
                 windowSizeBeforeFullScreenRef.current = {
                     height: window.innerHeight,
                     width: window.innerWidth,
@@ -131,13 +128,6 @@ export const useFullScreen = ({
 
             // Entering the full screen mode completes
             case FullScreenMode.Entered:
-                if (getCurrentScrollMode() === ScrollMode.Page) {
-                    jumpToPage(targetPageRef.current).then(() => {
-                        setFullScreenMode(FullScreenMode.EnteredCompletely);
-                    });
-                } else {
-                    setFullScreenMode(FullScreenMode.EnteredCompletely);
-                }
                 break;
 
             case FullScreenMode.Exitting:
@@ -145,15 +135,11 @@ export const useFullScreen = ({
                     fullScreenElementRef.current.style.backgroundColor = '';
                     fullScreenElementRef.current = null;
                 }
-                targetPageRef.current = getCurrentPage();
                 break;
 
             // Exitting the full screen mode completes
             case FullScreenMode.Exited:
                 setFullScreenMode(FullScreenMode.Normal);
-                if (getCurrentScrollMode() === ScrollMode.Page) {
-                    jumpToPage(targetPageRef.current);
-                }
                 break;
 
             default:
@@ -168,11 +154,11 @@ export const useFullScreen = ({
 
         if (
             fullScreenMode === FullScreenMode.Entering &&
-            windowRect.height === targetRect.height &&
-            windowRect.width === targetRect.width &&
+            equal(windowRect.height, targetRect.height) &&
+            equal(windowRect.width, targetRect.width) &&
             windowRect.height > 0 &&
             windowRect.width > 0 &&
-            (fullScreenSizeRef.current.height === 0 || windowRect.height == fullScreenSizeRef.current.height)
+            (fullScreenSizeRef.current.height === 0 || equal(windowRect.height, fullScreenSizeRef.current.height))
         ) {
             fullScreenSizeRef.current = {
                 height: window.innerHeight,
@@ -184,8 +170,8 @@ export const useFullScreen = ({
 
         if (
             fullScreenMode === FullScreenMode.Exitting &&
-            windowSizeBeforeFullScreenRef.current.height === windowRect.height &&
-            windowSizeBeforeFullScreenRef.current.width === windowRect.width &&
+            equal(windowSizeBeforeFullScreenRef.current.height, windowRect.height) &&
+            equal(windowSizeBeforeFullScreenRef.current.width, windowRect.width) &&
             windowRect.height > 0 &&
             windowRect.width > 0
         ) {

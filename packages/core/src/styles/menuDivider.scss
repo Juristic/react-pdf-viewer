@@ -3,10 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
 .rpv-core__menu-divider {
-    border-bottom: 1px solid var(--rpv-core__menu-divider-border-bottom-color);
+    border-bottom: 1px solid var(--rpv-core-border-color);
     margin: 0.25rem 0;
 }

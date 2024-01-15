@@ -3,7 +3,7 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
 import * as React from 'react';
@@ -41,6 +41,7 @@ export interface PageSize {
     rotation: number;
 }
 export interface Plugin {
+    dependencies?: Plugin[];
     install?(pluginFunctions: PluginFunctions): void;
     renderPageLayer?(props: PluginRenderPageLayer): React.ReactElement;
     renderViewer?(props: RenderViewer): Slot;
@@ -399,7 +400,6 @@ export interface PopoverProps {
     closeOnEscape: boolean;
     content: RenderContent;
     lockScroll?: boolean;
-    offset: Offset;
     position: Position;
     target?: RenderTarget;
 }
@@ -409,7 +409,6 @@ export type RenderTooltipContent = () => React.ReactNode;
 export interface TooltipProps {
     ariaControlsSuffix?: string;
     content: RenderTooltipContent;
-    offset: Offset;
     position: Position;
     target: React.ReactElement;
 }
@@ -624,6 +623,8 @@ export function useIsMounted(): React.MutableRefObject<boolean>;
 
 export function usePrevious<T>(value: T): T;
 
+export function useSafeState<T>(initialState: T | (() => T)): [T, React.Dispatch<React.SetStateAction<T>>];
+
 export interface UseRenderQueue {
     getHighestPriorityPage: () => number;
     isInRange: (pageIndex: number) => boolean;
@@ -655,6 +656,8 @@ export function getDestination(doc: PdfJs.PdfDocument, dest: PdfJs.OutlineDestin
 export function isFullScreenEnabled(): boolean;
 
 export function isMac(): boolean;
+
+export function mergeRefs<T>(refs: Array<React.MutableRefObject<T> | React.LegacyRef<T> | null>): React.RefCallback<T>;
 
 // Vendors
 // pdfjs namespace

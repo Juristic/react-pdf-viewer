@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import {
     isMac,
@@ -17,8 +19,6 @@ import {
 import * as React from 'react';
 import { PrintIcon } from './PrintIcon';
 import { type RenderPrintProps } from './types/RenderPrintProps';
-
-const TOOLTIP_OFFSET = { left: 0, top: 8 };
 
 export const PrintButton: React.FC<RenderPrintProps> = ({ enableShortcuts, onClick }) => {
     const { l10n } = React.useContext(LocalizationContext);
@@ -40,7 +40,6 @@ export const PrintButton: React.FC<RenderPrintProps> = ({ enableShortcuts, onCli
                 </MinimalButton>
             }
             content={() => label}
-            offset={TOOLTIP_OFFSET}
         />
     );
 };

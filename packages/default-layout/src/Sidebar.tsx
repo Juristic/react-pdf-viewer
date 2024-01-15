@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import {
     LocalizationContext,
@@ -38,9 +40,6 @@ interface SidebarProps {
     thumbnailTabContent: React.ReactElement;
     tabs?: (defaultTabs: SidebarTab[]) => SidebarTab[];
 }
-
-const TOOLTIP_OFFSET_LTR = { left: 8, top: 0 };
-const TOOLTIP_OFFSET_RTL = { left: -8, top: 0 };
 
 export const Sidebar: React.FC<SidebarProps> = ({
     attachmentTabContent,
@@ -162,7 +161,6 @@ export const Sidebar: React.FC<SidebarProps> = ({
                                         </MinimalButton>
                                     }
                                     content={() => tab.title}
-                                    offset={isRtl ? TOOLTIP_OFFSET_RTL : TOOLTIP_OFFSET_LTR}
                                 />
                             </div>
                         ))}

@@ -3,16 +3,17 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
+'use client';
+
 import * as React from 'react';
-import { useEscape } from '../hooks/useEscape';
 import { useToggle } from '../hooks/useToggle';
 import { Position } from '../structs/Position';
 import { ToggleStatus } from '../structs/ToggleStatus';
-import { type Offset } from '../types/Offset';
 import { uniqueId } from '../utils/uniqueId';
+import { Portal } from './Portal';
 import { TooltipBody } from './TooltipBody';
 
 type RenderTooltipContent = () => React.ReactNode;
@@ -20,20 +21,13 @@ type RenderTooltipContent = () => React.ReactNode;
 export const Tooltip: React.FC<{
     ariaControlsSuffix?: string;
     content: RenderTooltipContent;
-    offset: Offset;
     position: Position;
     target: React.ReactElement;
-}> = ({ ariaControlsSuffix, content, offset, position, target }) => {
+}> = ({ ariaControlsSuffix, content, position, target }) => {
     const { opened, toggle } = useToggle(false);
     const targetRef = React.useRef<HTMLDivElement>();
     const contentRef = React.useRef<HTMLDivElement>();
     const controlsSuffix = React.useMemo(() => ariaControlsSuffix || `${uniqueId()}`, []);
-
-    useEscape(() => {
-        if (targetRef.current && document.activeElement && targetRef.current.contains(document.activeElement)) {
-            close();
-        }
-    });
 
     const open = (): void => {
         toggle(ToggleStatus.Open);
@@ -96,15 +90,19 @@ export const Tooltip: React.FC<{
                 {target}
             </div>
             {opened && (
-                <TooltipBody
-                    ariaControlsSuffix={controlsSuffix}
-                    contentRef={contentRef}
-                    offset={offset}
-                    position={position}
-                    targetRef={targetRef}
-                >
-                    {content()}
-                </TooltipBody>
+                <Portal offset={8} position={position} referenceRef={targetRef}>
+                    {({ position: updatedPosition, ref }) => (
+                        <TooltipBody
+                            ariaControlsSuffix={controlsSuffix}
+                            closeOnEscape={true}
+                            position={updatedPosition}
+                            ref={ref}
+                            onClose={close}
+                        >
+                            {content()}
+                        </TooltipBody>
+                    )}
+                </Portal>
             )}
         </>
     );

@@ -3,14 +3,16 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import {
     Spinner,
     getPage,
     useIntersectionObserver,
-    useIsMounted,
+    useSafeState,
     type PdfJs,
     type Store,
     type StoreHandler,
@@ -35,8 +37,7 @@ export const CoverInner: React.FC<{
         ? initialPagesRotation.get(normalizePage)
         : 0;
 
-    const [src, setSrc] = React.useState('');
-    const isMounted = useIsMounted();
+    const [src, setSrc] = useSafeState('');
     const renderTask = React.useRef<PdfJs.PageRenderTask>();
     const [rotation, setRotation] = React.useState(store.get('rotation') || 0);
     const [pageRotation, setPageRotation] = React.useState(initialTargetPageRotation);
@@ -103,7 +104,7 @@ export const CoverInner: React.FC<{
             renderTask.current = page.render({ canvasContext, viewport: renderViewport });
             renderTask.current.promise.then(
                 (): void => {
-                    isMounted.current && setSrc(canvas.toDataURL());
+                    setSrc(canvas.toDataURL());
                     canvas.width = 0;
                     canvas.height = 0;
                 },

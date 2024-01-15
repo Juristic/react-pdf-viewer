@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import {
     LocalizationContext,
@@ -14,8 +16,6 @@ import {
     Popover,
     Position,
     ScrollMode,
-    TextDirection,
-    ThemeContext,
     Tooltip,
     ViewMode,
     type LocalizationMap,
@@ -26,14 +26,10 @@ import * as React from 'react';
 import { MoreIcon } from './MoreIcon';
 import { type ToolbarSlot } from './types/ToolbarSlot';
 
-const PORTAL_OFFSET = { left: 0, top: 8 };
-
 export const MoreActionsPopover: React.FC<{
     toolbarSlot: ToolbarSlot;
 }> = ({ toolbarSlot }) => {
     const { l10n } = React.useContext(LocalizationContext);
-    const { direction } = React.useContext(ThemeContext);
-    const portalPosition = direction === TextDirection.RightToLeft ? Position.BottomLeft : Position.BottomRight;
     const {
         DownloadMenuItem,
         EnterFullScreenMenuItem,
@@ -58,7 +54,7 @@ export const MoreActionsPopover: React.FC<{
         return (
             <Tooltip
                 ariaControlsSuffix="toolbar-more-actions"
-                position={portalPosition}
+                position={Position.BottomCenter}
                 target={
                     <MinimalButton
                         ariaLabel={label}
@@ -70,7 +66,6 @@ export const MoreActionsPopover: React.FC<{
                     </MinimalButton>
                 }
                 content={() => label}
-                offset={PORTAL_OFFSET}
             />
         );
     };
@@ -139,10 +134,9 @@ export const MoreActionsPopover: React.FC<{
         <Popover
             ariaControlsSuffix="toolbar-more-actions"
             ariaHasPopup="menu"
-            position={portalPosition}
+            position={Position.BottomCenter}
             target={renderTarget}
             content={renderContent}
-            offset={PORTAL_OFFSET}
             closeOnClickOutside={true}
             closeOnEscape={true}
         />

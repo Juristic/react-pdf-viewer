@@ -3,15 +3,15 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import { LocalizationContext, MinimalButton, Position, Tooltip, type LocalizationMap } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { DownloadIcon } from './DownloadIcon';
 import { type RenderDownloadProps } from './types/RenderDownloadProps';
-
-const TOOLTIP_OFFSET = { left: 0, top: 8 };
 
 export const DownloadButton: React.FC<RenderDownloadProps> = ({ onClick }) => {
     const { l10n } = React.useContext(LocalizationContext);
@@ -27,7 +27,6 @@ export const DownloadButton: React.FC<RenderDownloadProps> = ({ onClick }) => {
                 </MinimalButton>
             }
             content={() => label}
-            offset={TOOLTIP_OFFSET}
         />
     );
 };

@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import {
     isMac,
@@ -17,8 +19,6 @@ import {
 import * as React from 'react';
 import { type RenderZoomOutProps } from './types/RenderZoomOutProps';
 import { ZoomOutIcon } from './ZoomOutIcon';
-
-const TOOLTIP_OFFSET = { left: 0, top: 8 };
 
 export const ZoomOutButton: React.FC<RenderZoomOutProps> = ({ enableShortcuts, onClick }) => {
     const { l10n } = React.useContext(LocalizationContext);
@@ -40,7 +40,6 @@ export const ZoomOutButton: React.FC<RenderZoomOutProps> = ({ enableShortcuts, o
                 </MinimalButton>
             }
             content={() => label}
-            offset={TOOLTIP_OFFSET}
         />
     );
 };

@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import * as React from 'react';
 import { useMeasureRect } from '../hooks/useMeasureRect';
@@ -90,8 +92,8 @@ export const useVirtual = ({
         scrollMode === ScrollMode.Wrapped || viewMode === ViewMode.DualPageWithCover || viewMode === ViewMode.DualPage
             ? ScrollDirection.Both
             : scrollMode === ScrollMode.Horizontal
-            ? ScrollDirection.Horizontal
-            : ScrollDirection.Vertical;
+              ? ScrollDirection.Horizontal
+              : ScrollDirection.Vertical;
 
     const { scrollOffset, scrollTo } = useScroll({
         elementRef: parentRef,

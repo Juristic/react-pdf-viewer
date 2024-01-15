@@ -3,35 +3,40 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
+'use client';
+
 import * as React from 'react';
-import { useClickOutside } from '../hooks/useClickOutside';
-import { useEscape } from '../hooks/useEscape';
 import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 import { useLockScroll } from '../hooks/useLockScroll';
 import { TextDirection, ThemeContext } from '../theme/ThemeContext';
 import { classNames } from '../utils/classNames';
+import { mergeRefs } from '../utils/mergeRefs';
+import { useClickOutsideStack } from './useClickOutsideStack';
+import { useEscapeStack } from './useEscapeStack';
 
 export const ModalBody: React.FC<{
     ariaControlsSuffix: string;
     children?: React.ReactNode;
     closeOnClickOutside: boolean;
     closeOnEscape: boolean;
-    onToggle(): void;
-}> = ({ ariaControlsSuffix, children, closeOnClickOutside, closeOnEscape, onToggle }) => {
-    const contentRef = React.useRef<HTMLDivElement>();
+    onClose(): void;
+}> = ({ ariaControlsSuffix, children, closeOnClickOutside, closeOnEscape, onClose }) => {
     const { direction } = React.useContext(ThemeContext);
     const isRtl = direction === TextDirection.RightToLeft;
 
+    const contentRef = React.useRef<HTMLElement>();
+    const [contentCallbackRef] = useClickOutsideStack(closeOnClickOutside, onClose);
+    const mergedContentRef = mergeRefs([contentRef, contentCallbackRef]);
+
     useLockScroll();
-    useEscape(() => {
-        if (contentRef.current && closeOnEscape) {
-            onToggle();
+    useEscapeStack(() => {
+        if (closeOnEscape) {
+            onClose();
         }
     });
-    useClickOutside(closeOnClickOutside, contentRef, onToggle);
 
     useIsomorphicLayoutEffect(() => {
         const contentEle = contentRef.current;
@@ -55,7 +60,7 @@ export const ModalBody: React.FC<{
                 'rpv-core__modal-body--rtl': isRtl,
             })}
             id={`rpv-core__modal-body-${ariaControlsSuffix}`}
-            ref={contentRef}
+            ref={mergedContentRef}
             role="dialog"
             tabIndex={-1}
         >

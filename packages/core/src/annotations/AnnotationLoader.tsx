@@ -3,11 +3,13 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
+'use client';
+
 import * as React from 'react';
-import { useIsMounted } from '../hooks/useIsMounted';
+import { useSafeState } from '../hooks/useSafeState';
 import { type PdfJs } from '../types/PdfJs';
 
 interface Status {
@@ -19,20 +21,17 @@ export const AnnotationLoader: React.FC<{
     page: PdfJs.Page;
     renderAnnotations(annotations: PdfJs.Annotation[]): React.ReactElement;
 }> = ({ page, renderAnnotations }) => {
-    const isMounted = useIsMounted();
-    const [status, setStatus] = React.useState<Status>({
+    const [status, setStatus] = useSafeState<Status>({
         loading: true,
         annotations: [],
     });
 
     React.useEffect(() => {
         page.getAnnotations({ intent: 'display' }).then((result) => {
-            if (isMounted.current) {
-                setStatus({
-                    loading: false,
-                    annotations: result,
-                });
-            }
+            setStatus({
+                loading: false,
+                annotations: result,
+            });
         });
     }, []);
 

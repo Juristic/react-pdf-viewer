@@ -3,26 +3,70 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
-import * as React from 'react';
-import { useToggle } from '../hooks/useToggle';
-import { type Toggle } from '../types/Toggle';
+'use client';
 
-export type RenderContent = (toggle: Toggle) => React.ReactNode;
-export type RenderTarget = (toggle: Toggle, opened: boolean) => React.ReactNode;
+import * as React from 'react';
+import { useAnimationFrame } from '../hooks/useAnimationFrame';
+import { Position } from '../structs/Position';
+import { determineBestPosition } from '../utils/determineBestPosition';
+import { Stack } from './Stack';
+
+const areRectsEqual = (a: DOMRect, b: DOMRect) =>
+    ['top', 'left', 'width', 'height'].every((key) => a[key as keyof DOMRect] === b[key as keyof DOMRect]);
 
 export const Portal: React.FC<{
-    content: RenderContent;
-    isOpened?: boolean;
-    target?: RenderTarget;
-}> = ({ content, isOpened = false, target }) => {
-    const { opened, toggle } = useToggle(isOpened);
-    return (
-        <>
-            {target && target(toggle, opened)}
-            {opened && content(toggle)}
-        </>
+    children: ({ position, ref }: { position: Position; ref: React.RefCallback<HTMLElement> }) => React.ReactNode;
+    offset?: number;
+    position: Position;
+    referenceRef: React.MutableRefObject<HTMLElement>;
+}> = ({ children, offset = 0, position, referenceRef }) => {
+    const EMPTY_DOM_RECT = new DOMRect();
+
+    const [ele, setEle] = React.useState<HTMLElement>();
+    const [updatedPosition, setUpdatedPosition] = React.useState(position);
+
+    const targetRef = React.useCallback((ele: HTMLElement) => {
+        setEle(ele);
+    }, []);
+
+    const prevBoundingRectsRef = React.useRef<DOMRect[]>([]);
+    const [start] = useAnimationFrame(
+        () => {
+            if (!ele || !referenceRef.current) {
+                return;
+            }
+            const referenceRect = referenceRef.current.getBoundingClientRect();
+            const targetRect = ele.getBoundingClientRect();
+            const containerRect = new DOMRect(0, 0, window.innerWidth, window.innerHeight);
+            const rects = [referenceRect, targetRect, containerRect];
+            if (rects.some((rect, i) => !areRectsEqual(rect, prevBoundingRectsRef.current[i] || EMPTY_DOM_RECT))) {
+                prevBoundingRectsRef.current = rects;
+
+                const updatedPlacement = determineBestPosition(
+                    referenceRect,
+                    targetRect,
+                    containerRect,
+                    position,
+                    offset,
+                );
+                if (updatedPlacement.rect) {
+                    ele.style.transform = `translate(${updatedPlacement.rect.left}px, ${updatedPlacement.rect.top}px)`;
+                    setUpdatedPosition(updatedPlacement.position);
+                }
+            }
+        },
+        true,
+        [ele],
     );
+
+    React.useEffect(() => {
+        if (ele) {
+            start();
+        }
+    }, [ele]);
+
+    return <Stack>{children({ position: updatedPosition, ref: targetRef })}</Stack>;
 };

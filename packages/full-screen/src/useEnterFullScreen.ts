@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import { FullScreenMode, type Store } from '@react-pdf-viewer/core';
 import * as React from 'react';
@@ -48,6 +50,6 @@ export const useEnterFullScreen = (
     return {
         enterFullScreen,
         exitFullScreen,
-        isFullScreen: fullScreenMode === FullScreenMode.Entering || fullScreenMode === FullScreenMode.EnteredCompletely,
+        isFullScreen: fullScreenMode === FullScreenMode.Entering || fullScreenMode === FullScreenMode.Entered,
     };
 };

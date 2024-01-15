@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import { LocalizationContext, MenuItem, ThemeContext, type LocalizationMap } from '@react-pdf-viewer/core';
 import * as React from 'react';
@@ -26,8 +28,8 @@ export const SwitchThemeMenuItem: React.FC<SwitchThemeMenuItemProps> = ({ onClic
                 ? ((l10n.theme as LocalizationMap).switchLightTheme as string)
                 : ((l10n.theme as LocalizationMap).switchDarkTheme as string)
             : isDarkTheme
-            ? 'Switch to the light theme'
-            : 'Switch to the dark theme';
+              ? 'Switch to the light theme'
+              : 'Switch to the dark theme';
 
     return (
         <MenuItem icon={isDarkTheme ? <LightIcon /> : <DarkIcon />} testId="theme__switch-menu" onClick={onClick}>

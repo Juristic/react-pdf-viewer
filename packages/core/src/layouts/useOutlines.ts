@@ -3,11 +3,13 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
+'use client';
+
 import * as React from 'react';
-import { useIsMounted } from '../hooks/useIsMounted';
+import { useSafeState } from '../hooks/useSafeState';
 import { type PdfJs } from '../types/PdfJs';
 
 const flaternSingleOutline = (outline: PdfJs.Outline): PdfJs.Outline[] => {
@@ -27,12 +29,11 @@ const flaternOutlines = (outlines: PdfJs.Outline[]): PdfJs.Outline[] => {
 };
 
 export const useOutlines = (doc: PdfJs.PdfDocument) => {
-    const isMounted = useIsMounted();
-    const [outlines, setOutlines] = React.useState<PdfJs.Outline[]>([]);
+    const [outlines, setOutlines] = useSafeState<PdfJs.Outline[]>([]);
 
     React.useEffect(() => {
         doc.getOutline().then((result) => {
-            if (isMounted.current && result !== null) {
+            if (result !== null) {
                 const items = flaternOutlines(result);
                 setOutlines(items);
             }

@@ -3,18 +3,18 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
 .rpv-core__popover-body {
     background-color: var(--rpv-core__popover-body-background-color);
-    border: 1px solid var(--rpv-core__popover-body-border-color);
+    border: 1px solid var(--rpv-core-border-color);
     border-radius: 0.25rem;
     color: var(--rpv-core__popover-body-color);
     left: 0;
     padding: 0.5rem 0;
-    position: absolute;
-    top: -9999px;
+    position: fixed;
+    top: 0;
     z-index: 9999;
 
     &-arrow {

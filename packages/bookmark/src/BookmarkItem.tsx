@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import { getDestination, type PdfJs, type Store } from '@react-pdf-viewer/core';
 import * as React from 'react';
@@ -43,8 +45,8 @@ export const BookmarkItem: React.FC<{
     const defaultExpanded = isBookmarkExpanded
         ? isBookmarkExpanded({ bookmark, doc, depth, index })
         : bookmarkExpandedMap.has(path)
-        ? bookmarkExpandedMap.get(path)
-        : !defaultIsCollapsed;
+          ? bookmarkExpandedMap.get(path)
+          : !defaultIsCollapsed;
     const [expanded, setExpanded] = React.useState(defaultExpanded);
 
     const hasSubItems = bookmark.items && bookmark.items.length > 0;

@@ -3,7 +3,7 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
 :root {
@@ -11,6 +11,6 @@
 }
 
 /* Dark theme */
-.rpv-core__viewer--dark {
-    --rpv-full-screen__overlay-background-color: #1a1a1a;    
+:is(.rpv--dark) {
+    --rpv-full-screen__overlay-background-color: #1a1a1a;
 }

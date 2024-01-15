@@ -3,15 +3,15 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import { MinimalButton, Position, Tooltip, isMac, type Store, type StoreHandler } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { ShowSearchPopoverDecorator } from './ShowSearchPopoverDecorator';
 import { type StoreProps } from './types/StoreProps';
-
-const TOOLTIP_OFFSET = { left: 0, top: 8 };
 
 export const ShowSearchPopoverButton: React.FC<{
     enableShortcuts: boolean;
@@ -51,7 +51,6 @@ export const ShowSearchPopoverButton: React.FC<{
                         </MinimalButton>
                     }
                     content={() => p.label}
-                    offset={TOOLTIP_OFFSET}
                 />
             )}
         </ShowSearchPopoverDecorator>

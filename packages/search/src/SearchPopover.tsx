@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import {
     Button,
@@ -26,8 +28,6 @@ import { PreviousIcon } from './PreviousIcon';
 import { type StoreProps } from './types/StoreProps';
 import { useSearch } from './useSearch';
 import { normalizeSingleKeyword } from './normalizeKeyword';
-
-const PORTAL_OFFSET = { left: 0, top: 8 };
 
 export const SearchPopover: React.FC<{
     store: Store<StoreProps>;
@@ -169,7 +169,6 @@ export const SearchPopover: React.FC<{
                             </MinimalButton>
                         }
                         content={() => previousMatchLabel}
-                        offset={PORTAL_OFFSET}
                     />
                 </div>
                 <div className="rpv-search__popover-footer-item">
@@ -186,7 +185,6 @@ export const SearchPopover: React.FC<{
                             </MinimalButton>
                         }
                         content={() => nextMatchLabel}
-                        offset={PORTAL_OFFSET}
                     />
                 </div>
                 <div

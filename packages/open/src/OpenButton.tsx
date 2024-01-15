@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import {
     LocalizationContext,
@@ -19,8 +21,6 @@ import * as React from 'react';
 import { OpenFileIcon } from './OpenFileIcon';
 import { type StoreProps } from './types/StoreProps';
 import { useTriggerOpen } from './useTriggerOpen';
-
-const TOOLTIP_OFFSET = { left: 0, top: 8 };
 
 export const OpenButton: React.FC<{
     enableShortcuts: boolean;
@@ -60,7 +60,6 @@ export const OpenButton: React.FC<{
                 </div>
             }
             content={() => label}
-            offset={TOOLTIP_OFFSET}
         />
     );
 };

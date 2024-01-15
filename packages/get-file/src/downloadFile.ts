@@ -3,7 +3,7 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
 
 import { type PdfJs } from '@react-pdf-viewer/core';
@@ -49,7 +49,7 @@ export const downloadFile = (doc: PdfJs.PdfDocument, saveAs: string): void => {
               // Using `application/octet-stream` forces iOS Safari to download the file
               downloadBlob(data, saveAs, 'application/octet-stream')
             : isChromeIOS()
-            ? download(`data:application/pdf;base64,${encodeUint8Array(data)}`, saveAs)
-            : downloadBlob(data, saveAs, 'application/pdf');
+              ? download(`data:application/pdf;base64,${encodeUint8Array(data)}`, saveAs)
+              : downloadBlob(data, saveAs, 'application/pdf');
     });
 };

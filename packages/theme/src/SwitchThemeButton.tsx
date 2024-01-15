@@ -3,8 +3,10 @@
  *
  * @see https://react-pdf-viewer.dev
  * @license https://react-pdf-viewer.dev/license
- * @copyright 2019-2023 Nguyen Huu Phuoc <me@phuoc.ng>
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
  */
+
+'use client';
 
 import {
     LocalizationContext,
@@ -17,8 +19,6 @@ import {
 import * as React from 'react';
 import { DarkIcon } from './DarkIcon';
 import { LightIcon } from './LightIcon';
-
-const TOOLTIP_OFFSET = { left: 0, top: 8 };
 
 export const SwitchThemeButton: React.FC<{
     onClick(): void;
@@ -33,8 +33,8 @@ export const SwitchThemeButton: React.FC<{
                 ? ((l10n.theme as LocalizationMap).switchLightTheme as string)
                 : ((l10n.theme as LocalizationMap).switchDarkTheme as string)
             : isDarkTheme
-            ? 'Switch to the light theme'
-            : 'Switch to the dark theme';
+              ? 'Switch to the light theme'
+              : 'Switch to the dark theme';
 
     return (
         <Tooltip
@@ -46,7 +46,6 @@ export const SwitchThemeButton: React.FC<{
                 </MinimalButton>
             }
             content={() => label}
-            offset={TOOLTIP_OFFSET}
         />
     );
 };
