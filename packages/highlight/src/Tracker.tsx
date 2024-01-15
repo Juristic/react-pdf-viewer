@@ -124,6 +124,7 @@ export const Tracker: React.FC<{
             case SelectionRange.SameDiv:
                 // eslint-disable-next-line no-case-declarations
                 const rect = getRectFromOffsets(startDiv, startOffset, endOffset);
+                if (!rect) break;
                 highlightAreas = [
                     {
                         height: (rect.height * 100) / startPageRect.height,
@@ -139,7 +140,8 @@ export const Tracker: React.FC<{
                 highlightAreas = [getRectFromOffsets(startDiv, startOffset, startDiv.textContent!.length)]
                     .concat(getRectBetween(startDivIndex + 1, endDivIndex - 1, startDivSiblings))
                     .concat([getRectFromOffsets(endDiv, 0, endOffset)])
-                    .map((rect) => {
+                    .filter((rect) => rect !== null)
+                    .map((rect: DOMRect) => {
                         return {
                             height: (rect.height * 100) / startPageRect.height,
                             left: ((rect.left - startPageRect.left) * 100) / startPageRect.width,
@@ -154,6 +156,7 @@ export const Tracker: React.FC<{
                 // eslint-disable-next-line no-case-declarations
                 const startAreas = [getRectFromOffsets(startDiv, startOffset, startDiv.textContent!.length)]
                     .concat(getRectBetween(startDivIndex + 1, startDivSiblings.length - 1, startDivSiblings))
+                    .filter((rect) => rect !== null)
                     .map((rect) => {
                         return {
                             height: (rect.height * 100) / startPageRect.height,
@@ -166,6 +169,7 @@ export const Tracker: React.FC<{
                 // eslint-disable-next-line no-case-declarations
                 const endAreas = getRectBetween(0, endDivIndex - 1, endDivSiblings)
                     .concat([getRectFromOffsets(endDiv, 0, endOffset)])
+                    .filter((rect) => rect !== null)
                     .map((rect) => {
                         return {
                             height: (rect.height * 100) / endPageRect.height,
