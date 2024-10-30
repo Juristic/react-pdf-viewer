@@ -132,6 +132,8 @@ export const Tracker: React.FC<{
                         pageIndex: startPageIndex,
                         top: ((rect.top - startPageRect.top) * 100) / startPageRect.height,
                         width: (rect.width * 100) / startPageRect.width,
+                        pageWidth: startPageRect.width,
+                        pageHeight: startPageRect.height,
                     },
                 ];
                 break;
@@ -148,6 +150,8 @@ export const Tracker: React.FC<{
                             pageIndex: startPageIndex,
                             top: ((rect.top - startPageRect.top) * 100) / startPageRect.height,
                             width: (rect.width * 100) / startPageRect.width,
+                            pageWidth: startPageRect.width,
+                            pageHeight: startPageRect.height,
                         };
                     });
                 break;
@@ -164,6 +168,8 @@ export const Tracker: React.FC<{
                             pageIndex: startPageIndex,
                             top: ((rect.top - startPageRect.top) * 100) / startPageRect.height,
                             width: (rect.width * 100) / startPageRect.width,
+                            pageWidth: startPageRect.width,
+                            pageHeight: startPageRect.height,
                         };
                     });
                 // eslint-disable-next-line no-case-declarations
@@ -177,6 +183,8 @@ export const Tracker: React.FC<{
                             pageIndex: endPageIndex,
                             top: ((rect.top - endPageRect.top) * 100) / endPageRect.height,
                             width: (rect.width * 100) / endPageRect.width,
+                            pageWidth: endPageRect.width,
+                            pageHeight: endPageRect.height,
                         };
                     });
                 highlightAreas = startAreas.concat(endAreas);
@@ -244,6 +252,8 @@ export const Tracker: React.FC<{
                 pageIndex: endPageIndex,
                 top: ((endDivRect.top - endPageRect.top) * 100) / endPageRect.height,
                 width: (endDivRect.width * 100) / endPageRect.width,
+                pageWidth: endPageRect.width,
+                pageHeight: endPageRect.height,
             };
         }
 

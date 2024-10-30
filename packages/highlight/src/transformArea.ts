@@ -61,6 +61,8 @@ export const transformArea = (area: HighlightArea, rotation: number): HighlightA
                 pageIndex: area.pageIndex,
                 top: 100 - area.width - area.left,
                 width: area.height,
+                pageHeight: area.pageHeight,
+                pageWidth: area.pageWidth,
             };
         case 180:
             return {
@@ -69,6 +71,8 @@ export const transformArea = (area: HighlightArea, rotation: number): HighlightA
                 pageIndex: area.pageIndex,
                 top: 100 - area.height - area.top,
                 width: area.width,
+                pageHeight: area.pageHeight,
+                pageWidth: area.pageWidth,
             };
         case 270:
             return {
@@ -77,6 +81,8 @@ export const transformArea = (area: HighlightArea, rotation: number): HighlightA
                 pageIndex: area.pageIndex,
                 top: area.left,
                 width: area.height,
+                pageHeight: area.pageHeight,
+                pageWidth: area.pageWidth,
             };
         case 0:
         case 360:
