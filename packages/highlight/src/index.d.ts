@@ -16,6 +16,8 @@ export interface HighlightArea {
     pageIndex: number;
     top: number;
     width: number;
+    pageWidth: number;
+    pageHeight: number;
 }
 
 export interface RenderHighlightContentProps {

@@ -24,6 +24,8 @@ const EMPTY_SELECTION_REGION: HighlightArea = {
     pageIndex: -1,
     top: 0,
     width: 0,
+    pageHeight: 0,
+    pageWidth: 0,
 };
 
 export const NO_SELECTION_STATE = {

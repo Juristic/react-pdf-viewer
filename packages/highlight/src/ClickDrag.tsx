@@ -137,12 +137,19 @@ export const ClickDrag: React.FC<{
         if (!container || !canvasEle) {
             return;
         }
+        const textLayerEl = textLayerRef.current;
+        const textLayerRect = textLayerEl.getBoundingClientRect();
+        const pageHeight = textLayerRect.height;
+        const pageWidth = textLayerRect.width;
+
         const highlightArea = {
             pageIndex,
             top: parseFloat(container.style.top.slice(0, -1)),
             left: parseFloat(container.style.left.slice(0, -1)),
             height: parseFloat(container.style.height.slice(0, -1)),
             width: parseFloat(container.style.width.slice(0, -1)),
+            pageWidth,
+            pageHeight,
         };
         const previewImage = getImageFromArea()(canvasEle, highlightArea);
         const newState = {
