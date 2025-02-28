@@ -1,0 +1,44 @@
+/**
+ * A React component to view a PDF document
+ *
+ * @see https://react-pdf-viewer.dev
+ * @license https://react-pdf-viewer.dev/license
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+
+.layer {
+    /* Absolute position */
+    left: 0;
+    position: absolute;
+    top: 0;
+
+    /* Take the full size */
+    height: 100%;
+    width: 100%;
+
+    /* Improve the text selection */
+    opacity: 0.2;
+
+    /* Misc */
+    line-height: 1;
+
+    /* Make it displayed on top of the shadow layer, so users can select text of pages */
+    z-index: 1;
+
+    transform-origin: 0 0;
+}
+.layer span::selection {
+    background-color: var(--rpv-core__text-layer-text--selection-background-color);
+    color: var(--rpv-core__text-layer-text--selection-color);
+}
+.layer br::selection {
+    color: transparent;
+}
+
+.text {
+    color: transparent;
+    cursor: text;
+    position: absolute;
+    transform-origin: 0% 0%;
+    white-space: pre;
+}

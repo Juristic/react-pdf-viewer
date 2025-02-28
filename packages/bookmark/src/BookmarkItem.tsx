@@ -14,9 +14,11 @@ import { BookmarkList } from './BookmarkList';
 import { DownArrowIcon } from './DownArrowIcon';
 import { RightArrowIcon } from './RightArrowIcon';
 import { shouldBeCollapsed } from './shouldBeCollapsed';
+import styles from './styles/bookmarkItem.module.css';
 import { type IsBookmarkExpanded } from './types/IsBookmarkExpanded';
 import { type RenderBookmarkItem } from './types/RenderBookmarkItemProps';
 import { type StoreProps } from './types/StoreProps';
+import { useCollapse } from './useCollapse';
 
 export const BookmarkItem: React.FC<{
     bookmark: PdfJs.Outline;
@@ -44,21 +46,26 @@ export const BookmarkItem: React.FC<{
     const bookmarkExpandedMap = store.get('bookmarkExpandedMap');
     const defaultExpanded = isBookmarkExpanded
         ? isBookmarkExpanded({ bookmark, doc, depth, index })
-        : bookmarkExpandedMap.has(path)
-          ? bookmarkExpandedMap.get(path)
+        : bookmarkExpandedMap && bookmarkExpandedMap.has(path)
+          ? bookmarkExpandedMap.get(path)!
           : !defaultIsCollapsed;
+
     const [expanded, setExpanded] = React.useState(defaultExpanded);
+    const toggle = () => setExpanded((v) => !v);
+    const [subItemsListRef, collapseSubItems, expandSubItems] = useCollapse(toggle);
 
     const hasSubItems = bookmark.items && bookmark.items.length > 0;
 
     const toggleSubItems = (): void => {
-        const newState = !expanded;
-        store.updateCurrentValue('bookmarkExpandedMap', (currentValue) => currentValue.set(path, newState));
-        setExpanded(newState);
+        store.updateCurrentValue('bookmarkExpandedMap', (currentValue) => currentValue.set(path, !expanded));
+        expanded ? collapseSubItems() : expandSubItems();
     };
 
     const jumpToDest = () => {
         const { dest } = bookmark;
+        if (!dest) {
+            return;
+        }
         const jumpToDestination = store.get('jumpToDestination');
 
         getDestination(doc, dest).then((target) => {
@@ -85,7 +92,7 @@ export const BookmarkItem: React.FC<{
 
     const defaultRenderItem = (onClickItem: () => void, children: React.ReactNode) => (
         <div
-            className="rpv-bookmark__item"
+            className={styles.item}
             style={{
                 paddingLeft: `${depth * 1.25}rem`,
             }}
@@ -97,21 +104,17 @@ export const BookmarkItem: React.FC<{
 
     const defaultRenderToggle = (expandIcon: React.ReactElement, collapseIcon: React.ReactElement) =>
         hasSubItems ? (
-            <span
-                className="rpv-bookmark__toggle"
-                data-testid={`bookmark__toggle-${depth}-${index}`}
-                onClick={toggleSubItems}
-            >
+            <span className={styles.toggle} data-testid={`bookmark__toggle-${depth}-${index}`} onClick={toggleSubItems}>
                 {expanded ? expandIcon : collapseIcon}
             </span>
         ) : (
-            <span className="rpv-bookmark__toggle" />
+            <span className={styles.toggle} />
         );
 
     const defaultRenderTitle = (onClickBookmark: () => void) =>
         bookmark.url ? (
             <a
-                className="rpv-bookmark__title"
+                className={styles.title}
                 href={bookmark.url}
                 rel="noopener noreferrer nofollow"
                 target={bookmark.newWindow ? '_blank' : ''}
@@ -119,7 +122,7 @@ export const BookmarkItem: React.FC<{
                 {bookmark.title}
             </a>
         ) : (
-            <div className="rpv-bookmark__title" aria-label={bookmark.title} onClick={onClickBookmark}>
+            <div className={styles.title} aria-label={bookmark.title} onClick={onClickBookmark}>
                 {bookmark.title}
             </div>
         );
@@ -156,7 +159,7 @@ export const BookmarkItem: React.FC<{
                           {defaultRenderTitle(clickBookmark)}
                       </>,
                   )}
-            {hasSubItems && expanded && (
+            {hasSubItems && (
                 <BookmarkList
                     bookmarks={bookmark.items}
                     depth={depth + 1}
@@ -164,6 +167,7 @@ export const BookmarkItem: React.FC<{
                     isBookmarkExpanded={isBookmarkExpanded}
                     isRoot={false}
                     pathFromRoot={path}
+                    ref={subItemsListRef}
                     renderBookmarkItem={renderBookmarkItem}
                     store={store}
                 />

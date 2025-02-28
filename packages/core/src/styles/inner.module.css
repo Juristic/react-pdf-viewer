@@ -1,0 +1,64 @@
+/**
+ * A React component to view a PDF document
+ *
+ * @see https://react-pdf-viewer.dev
+ * @license https://react-pdf-viewer.dev/license
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+
+.container {
+    min-height: inherit;
+}
+
+.pages {
+    overflow: auto;
+}
+.pagesRtl {
+    direction: rtl;
+}
+.pagesSingle {
+    overflow: hidden;
+}
+
+.pageContainerSingle {
+    overflow: auto;
+}
+
+/* Single page viewmode */
+.pageSingle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dual page viewmode */
+.pageDualEven {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.pageDualOdd {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}
+
+/* Dual page with cover viewmode */
+.pageDualCover {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.pageDualCoverOdd {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.pageDualCoverEven {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+}

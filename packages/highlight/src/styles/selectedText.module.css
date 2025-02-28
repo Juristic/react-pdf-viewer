@@ -1,0 +1,28 @@
+/**
+ * A React component to view a PDF document
+ *
+ * @see https://react-pdf-viewer.dev
+ * @license https://react-pdf-viewer.dev/license
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+
+.selectedText {
+    background-color: var(--rpv-highlight__selected-text-background-color);
+}
+
+.selectedEnd {
+    display: block;
+
+    /* Absolute position */
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    right: 0;
+    top: 100%;
+
+    /* Make it hidden */
+    z-index: -1;
+
+    /* And unselectable */
+    user-select: none;
+}

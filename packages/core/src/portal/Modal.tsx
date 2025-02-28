@@ -13,7 +13,6 @@ import { useToggle } from '../hooks/useToggle';
 import type { Toggle } from '../types/Toggle';
 import { uniqueId } from '../utils/uniqueId';
 import { ModalBody } from './ModalBody';
-import { ModalOverlay } from './ModalOverlay';
 import { Stack } from './Stack';
 
 export type RenderContent = (toggle: Toggle) => React.ReactNode;
@@ -30,32 +29,34 @@ export const Modal: React.FC<{
     const controlsSuffix = ariaControlsSuffix || `${uniqueId()}`;
     const { opened, toggle } = useToggle(isOpened);
 
-    const renderTarget = (toggle: Toggle, opened: boolean): React.ReactElement => (
-        <div
-            aria-expanded={opened ? 'true' : 'false'}
-            aria-haspopup="dialog"
-            aria-controls={`rpv-core__modal-body-${controlsSuffix}`}
-        >
-            {target(toggle, opened)}
-        </div>
-    );
+    const renderTarget = (toggle: Toggle, opened: boolean): React.ReactElement => {
+        return target ? (
+            <div
+                aria-expanded={opened ? 'true' : 'false'}
+                aria-haspopup="dialog"
+                aria-controls={`rpv-core__modal-body-${controlsSuffix}`}
+            >
+                {target(toggle, opened)}
+            </div>
+        ) : (
+            <></>
+        );
+    };
 
     const renderContent = (toggle: Toggle): React.ReactElement => (
-        <ModalOverlay>
-            <ModalBody
-                ariaControlsSuffix={controlsSuffix}
-                closeOnClickOutside={closeOnClickOutside}
-                closeOnEscape={closeOnEscape}
-                onClose={toggle}
-            >
-                {content(toggle)}
-            </ModalBody>
-        </ModalOverlay>
+        <ModalBody
+            ariaControlsSuffix={controlsSuffix}
+            closeOnClickOutside={closeOnClickOutside}
+            closeOnEscape={closeOnEscape}
+            onClose={toggle}
+        >
+            {({ onClose }) => content(onClose)}
+        </ModalBody>
     );
 
     return (
         <>
-            {target && renderTarget(toggle, opened)}
+            {renderTarget(toggle, opened)}
             {opened && <Stack>{renderContent(toggle)}</Stack>}
         </>
     );

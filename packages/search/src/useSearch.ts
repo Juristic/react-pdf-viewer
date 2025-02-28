@@ -40,7 +40,7 @@ export const useSearch = (
     keyword: string;
     setKeyword(keyword: SingleKeyword | SingleKeyword[]): void;
 } => {
-    const initialKeyword = store.get('initialKeyword');
+    const initialKeyword = store.get('initialKeyword')!;
 
     const normalizedKeywordFlags = React.useMemo(() => {
         if (initialKeyword && initialKeyword.length === 1) {

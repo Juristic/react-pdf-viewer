@@ -11,6 +11,7 @@
 import { useSafeState, type PdfJs } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { isRunningInJest } from './isRunningInJest';
+import styles from './styles/pageThumbnail.module.css';
 
 export const PageThumbnail: React.FC<{
     canvas: HTMLCanvasElement;
@@ -60,8 +61,10 @@ export const PageThumbnail: React.FC<{
                 // `URL.createObjectURL` is not available in jest-dom yet
                 if ('toBlob' in canvas && 'createObjectURL' in URL) {
                     canvas.toBlob((blob) => {
-                        setSrc(URL.createObjectURL(blob));
-                        testWithJest && onLoad();
+                        if (blob) {
+                            setSrc(URL.createObjectURL(blob));
+                            testWithJest && onLoad();
+                        }
                     });
                 } else {
                     setSrc(canvas.toDataURL());
@@ -76,8 +79,13 @@ export const PageThumbnail: React.FC<{
 
     return (
         src && (
-            <div className="rpv-print__page">
-                <img data-testid={`print__thumbnail-${pageIndex}`} src={src} onLoad={handleImageLoad} />
+            <div className={styles.page}>
+                <img
+                    className={styles.image}
+                    data-testid={`print__thumbnail-${pageIndex}`}
+                    src={src}
+                    onLoad={handleImageLoad}
+                />
             </div>
         )
     );

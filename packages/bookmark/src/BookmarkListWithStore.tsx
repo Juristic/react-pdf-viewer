@@ -8,7 +8,7 @@
 
 'use client';
 
-import { Spinner, type PdfJs, type Store, type StoreHandler } from '@react-pdf-viewer/core';
+import { type PdfJs, type Store, type StoreHandler } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { BookmarkLoader } from './BookmarkLoader';
 import { type IsBookmarkExpanded } from './types/IsBookmarkExpanded';
@@ -16,7 +16,7 @@ import { type RenderBookmarkItem } from './types/RenderBookmarkItemProps';
 import { type StoreProps } from './types/StoreProps';
 
 export const BookmarkListWithStore: React.FC<{
-    isBookmarkExpanded: IsBookmarkExpanded;
+    isBookmarkExpanded?: IsBookmarkExpanded;
     renderBookmarkItem?: RenderBookmarkItem;
     store: Store<StoreProps>;
 }> = ({ isBookmarkExpanded, renderBookmarkItem, store }) => {
@@ -34,16 +34,12 @@ export const BookmarkListWithStore: React.FC<{
         };
     }, []);
 
-    return currentDoc ? (
+    return (
         <BookmarkLoader
             doc={currentDoc}
             isBookmarkExpanded={isBookmarkExpanded}
             renderBookmarkItem={renderBookmarkItem}
             store={store}
         />
-    ) : (
-        <div className="rpv-bookmark__loader">
-            <Spinner />
-        </div>
     );
 };

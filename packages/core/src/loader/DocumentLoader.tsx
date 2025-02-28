@@ -12,6 +12,7 @@ import * as React from 'react';
 import { Spinner } from '../components/Spinner';
 import { useSafeState } from '../hooks/useSafeState';
 import { PasswordStatus } from '../structs/PasswordStatus';
+import styles from '../styles/documentLoader.module.css';
 import { TextDirection, ThemeContext } from '../theme/ThemeContext';
 import { type CharacterMap } from '../types/CharacterMap';
 import { type DocumentAskPasswordEvent } from '../types/DocumentAskPasswordEvent';
@@ -59,6 +60,9 @@ export const DocumentLoader: React.FC<{
     const docRef = React.useRef<string>('');
 
     React.useEffect(() => {
+        if (!pdfJsApiProvider) {
+            return;
+        }
         // Reset the status when new `file` is provided (for example, when opening file from the toolbar)
         docRef.current = '';
         setStatus(new LoadingState(0));
@@ -145,11 +149,11 @@ export const DocumentLoader: React.FC<{
         ) : (
             <div
                 className={classNames({
-                    'rpv-core__doc-error': true,
-                    'rpv-core__doc-error--rtl': isRtl,
+                    [styles.error]: true,
+                    [styles.errorRtl]: isRtl,
                 })}
             >
-                <div className="rpv-core__doc-error-text">{(status as FailureState).error.message}</div>
+                <div className={styles.errorText}>{(status as FailureState).error.message}</div>
             </div>
         );
     }
@@ -158,8 +162,8 @@ export const DocumentLoader: React.FC<{
         <div
             data-testid="core__doc-loading"
             className={classNames({
-                'rpv-core__doc-loading': true,
-                'rpv-core__doc-loading--rtl': isRtl,
+                [styles.loading]: true,
+                [styles.loadingRtl]: isRtl,
             })}
         >
             {renderLoader ? renderLoader((status as LoadingState).percentages) : <Spinner />}

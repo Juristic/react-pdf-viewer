@@ -18,12 +18,13 @@ import {
 } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { downloadFile } from './downloadFile';
+import styles from './styles/attachmentList.module.css';
 import { type FileItem } from './types/FileItem';
 
 export const AttachmentList: React.FC<{
     files: FileItem[];
 }> = ({ files }) => {
-    const containerRef = React.useRef<HTMLDivElement>();
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const { l10n } = React.useContext(LocalizationContext);
     const { direction } = React.useContext(ThemeContext);
     const isRtl = direction === TextDirection.RightToLeft;
@@ -64,8 +65,8 @@ export const AttachmentList: React.FC<{
     };
 
     const moveToItem = (getItemIndex: (attachmentItems: Element[], activeElement: Element) => number) => {
-        const container = containerRef.current;
-        const attachmentItems: Element[] = [].slice.call(container.getElementsByClassName('rpv-attachment__item'));
+        const container = containerRef.current!;
+        const attachmentItems: Element[] = [].slice.call(container.getElementsByClassName(styles.item));
         if (attachmentItems.length === 0) {
             return;
         }
@@ -89,7 +90,7 @@ export const AttachmentList: React.FC<{
             return;
         }
 
-        const attachmentItems: HTMLElement[] = [].slice.call(container.getElementsByClassName('rpv-attachment__item'));
+        const attachmentItems: HTMLElement[] = [].slice.call(container.getElementsByClassName(styles.item));
         attachmentItemsRef.current = attachmentItems;
 
         // Focus the first attachment item automatically
@@ -104,8 +105,8 @@ export const AttachmentList: React.FC<{
         <div
             data-testid="attachment__list"
             className={classNames({
-                'rpv-attachment__list': true,
-                'rpv-attachment__list--rtl': isRtl,
+                [styles.list]: true,
+                [styles.listRtl]: isRtl,
             })}
             ref={containerRef}
             tabIndex={-1}
@@ -113,7 +114,7 @@ export const AttachmentList: React.FC<{
         >
             {files.map((file) => (
                 <button
-                    className="rpv-attachment__item"
+                    className={styles.item}
                     key={file.fileName}
                     tabIndex={-1}
                     title={clickDownloadLabel}

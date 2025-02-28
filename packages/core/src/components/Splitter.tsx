@@ -9,6 +9,8 @@
 'use client';
 
 import * as React from 'react';
+import { ResizeIcon } from '../icons/ResizeIcon';
+import styles from '../styles/splitter.module.css';
 import { TextDirection, ThemeContext } from '../theme/ThemeContext';
 
 export interface SplitterSize {
@@ -24,9 +26,9 @@ export const Splitter: React.FC<{
     const { direction } = React.useContext(ThemeContext);
     const isRtl = direction === TextDirection.RightToLeft;
 
-    const resizerRef = React.useRef<HTMLDivElement>();
-    const leftSideRef = React.useRef<HTMLElement>();
-    const rightSideRef = React.useRef<HTMLElement>();
+    const resizerRef = React.useRef<HTMLDivElement>(null);
+    const leftSideRef = React.useRef<HTMLElement | null>(null);
+    const rightSideRef = React.useRef<HTMLElement | null>(null);
 
     // The current position of mouse
     const xRef = React.useRef(0);
@@ -52,10 +54,10 @@ export const Splitter: React.FC<{
         const dx = e.clientX - xRef.current;
 
         const firstHalfSize = leftWidthRef.current + (isRtl ? -dx : dx);
-        const containerWidth = resizerEle.parentElement.getBoundingClientRect().width;
+        const containerWidth = resizerEle.parentElement!.getBoundingClientRect().width;
         const firstHalfPercentage = (firstHalfSize * 100) / containerWidth;
 
-        resizerEle.classList.add('rpv-core__splitter--resizing');
+        resizerEle.classList.add(styles.splitterResizing);
 
         if (constrain) {
             const secondHalfSize = containerWidth - firstHalfSize - resizerWidth;
@@ -67,10 +69,10 @@ export const Splitter: React.FC<{
 
         leftSide.style.width = `${firstHalfPercentage}%`;
 
-        document.body.classList.add('rpv-core__splitter-body--resizing');
+        document.body.classList.add(styles.bodyResizing);
 
-        leftSide.classList.add('rpv-core__splitter-sibling--resizing');
-        rightSide.classList.add('rpv-core__splitter-sibling--resizing');
+        leftSide.classList.add(styles.siblingResizing);
+        rightSide.classList.add(styles.siblingResizing);
     };
 
     const handleMouseUp = (e: MouseEvent) => {
@@ -81,11 +83,11 @@ export const Splitter: React.FC<{
             return;
         }
 
-        document.body.classList.remove('rpv-core__splitter-body--resizing');
+        document.body.classList.remove(styles.bodyResizing);
 
-        resizerEle.classList.remove('rpv-core__splitter--resizing');
-        leftSide.classList.remove('rpv-core__splitter-sibling--resizing');
-        rightSide.classList.remove('rpv-core__splitter-sibling--resizing');
+        resizerEle.classList.remove(styles.splitterResizing);
+        leftSide.classList.remove(styles.siblingResizing);
+        rightSide.classList.remove(styles.siblingResizing);
 
         // Remove the handlers of `mousemove` and `mouseup`
         document.removeEventListener('mousemove', handleMouseMove, eventOptions);
@@ -122,5 +124,11 @@ export const Splitter: React.FC<{
         rightSideRef.current = resizerEle.nextElementSibling as HTMLElement;
     }, []);
 
-    return <div ref={resizerRef} className="rpv-core__splitter" onMouseDown={handleMouseDown} />;
+    return (
+        <div ref={resizerRef} className={styles.splitter} onMouseDown={handleMouseDown}>
+            <div className={styles.handle}>
+                <ResizeIcon />
+            </div>
+        </div>
+    );
 };

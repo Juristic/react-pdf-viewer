@@ -14,6 +14,7 @@ import { HightlightItem } from './HightlightItem';
 import { calculateOffset } from './calculateOffset';
 import { EMPTY_KEYWORD_REGEXP } from './constants';
 import { getCssProperties } from './getCssProperties';
+import styles from './styles/highlight.module.css';
 import { type MatchPosition } from './types/MatchPosition';
 import { type NormalizedKeyword } from './types/NormalizedKeyword';
 import { type OnHighlightKeyword } from './types/OnHighlightKeyword';
@@ -65,7 +66,7 @@ export const Highlights: React.FC<{
     store: Store<StoreProps>;
     onHighlightKeyword?(props: OnHighlightKeyword): void;
 }> = ({ numPages, pageIndex, renderHighlights, store, onHighlightKeyword }) => {
-    const containerRef = React.useRef<HTMLDivElement>();
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const defaultRenderHighlights = React.useCallback(
         (renderProps: RenderHighlightsProps) => (
             <>
@@ -85,7 +86,7 @@ export const Highlights: React.FC<{
 
     // The initial matching position is taken from the store
     // So the current highlight is kept (after zooming the document, for example)
-    const [matchPosition, setMatchPosition] = React.useState<MatchPosition>(store.get('matchPosition'));
+    const [matchPosition, setMatchPosition] = React.useState<MatchPosition>(store.get('matchPosition')!);
     const [keywordRegexp, setKeywordRegexp] = React.useState<NormalizedKeyword[]>(
         store.get('keyword') || [EMPTY_KEYWORD_REGEXP],
     );
@@ -119,7 +120,7 @@ export const Highlights: React.FC<{
             return null;
         }
 
-        const length = firstChild.textContent.length;
+        const length = firstChild.textContent!.length;
         const startOffset = charIndexSpan[0].charIndexInSpan;
         const endOffset =
             charIndexSpan.length === 1 ? startOffset : charIndexSpan[charIndexSpan.length - 1].charIndexInSpan;
@@ -167,7 +168,7 @@ export const Highlights: React.FC<{
         }
 
         const highlightPos: HighlightArea[] = [];
-        const spans: HTMLElement[] = [].slice.call(textLayerEle.querySelectorAll('.rpv-core__text-layer-text'));
+        const spans: HTMLElement[] = [].slice.call(textLayerEle.querySelectorAll('[data-text="true"]'));
 
         // Generate the full text of page
         const fullText = charIndexes.map((item) => item.char).join('');
@@ -275,23 +276,24 @@ export const Highlights: React.FC<{
     // The order of hooks are important. Since `charIndexes` will be used when we highlight matching items,
     // this hook is put at the top
     React.useEffect(() => {
+        const textLayerEle = renderStatus.ele;
         if (
             isEmptyKeyword() ||
             renderStatus.status !== LayerRenderStatus.DidRender ||
-            characterIndexesRef.current.length
+            characterIndexesRef.current.length ||
+            !textLayerEle
         ) {
             return;
         }
 
-        const textLayerEle = renderStatus.ele;
-        const spans: HTMLElement[] = [].slice.call(textLayerEle.querySelectorAll('.rpv-core__text-layer-text'));
+        const spans: HTMLElement[] = [].slice.call(textLayerEle.querySelectorAll('[data-text="true"]'));
 
         const charIndexes: CharIndex[] = spans
             .map((span) => span.textContent)
             .reduce(
                 (prev, curr, index) =>
                     prev.concat(
-                        curr.split('').map((c, i) => ({
+                        curr!.split('').map((c, i) => ({
                             char: c,
                             charIndexInSpan: i,
                             spanIndex: index,
@@ -351,7 +353,7 @@ export const Highlights: React.FC<{
         }
 
         const highlightEls: NodeListOf<HTMLElement> = container.querySelectorAll(
-            `.rpv-search__highlight[data-index="${matchPosition.matchIndex}"][title="${matchPosition.title}"]`,
+            `.${styles.highlight}[data-index="${matchPosition.matchIndex}"][title="${matchPosition.title}"]`,
         );
 
         if (!highlightEls || highlightEls.length === 0) {
@@ -368,10 +370,10 @@ export const Highlights: React.FC<{
                 scaleTo: renderStatus.scale,
             });
             if (currentMatchRef.current) {
-                currentMatchRef.current.forEach((el) => el.classList.remove('rpv-search__highlight--current'));
+                currentMatchRef.current.forEach((el) => el.classList.remove(styles.highlightCurrent));
             }
             currentMatchRef.current = highlightEls;
-            highlightEls.forEach((el) => el.classList.add('rpv-search__highlight--current'));
+            highlightEls.forEach((el) => el.classList.add(styles.highlightCurrent));
         }
     }, [highlightAreas, matchPosition]);
 
@@ -388,7 +390,7 @@ export const Highlights: React.FC<{
     }, []);
 
     return (
-        <div className="rpv-search__highlights" data-testid={`search__highlights-${pageIndex}`} ref={containerRef}>
+        <div className={styles.highlights} data-testid={`search__highlights-${pageIndex}`} ref={containerRef}>
             {renderHighlightElements({
                 getCssProperties,
                 highlightAreas,

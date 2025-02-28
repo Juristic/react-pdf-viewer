@@ -1,0 +1,50 @@
+/**
+ * A React component to view a PDF document
+ *
+ * @see https://react-pdf-viewer.dev
+ * @license https://react-pdf-viewer.dev/license
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+
+.cover {
+    /* Center the canvas */
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    /* Take the full size */
+    height: 100%;
+    width: 100%;
+
+    /* It's used when the cover is placed inside a `min-height` container */
+    min-height: inherit;
+}
+
+.loader {
+    /* Center the spinner */
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    /* Take the full size */
+    height: 100%;
+    width: 100%;
+}
+
+.inner {
+    /* Center the spinner */
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    /* Take the full size */
+    height: 100%;
+    width: 100%;
+
+    min-height: inherit;
+}
+
+.image {
+    max-height: 100%;
+    max-width: 100%;
+}

@@ -1,0 +1,36 @@
+/**
+ * A React component to view a PDF document
+ *
+ * @see https://react-pdf-viewer.dev
+ * @license https://react-pdf-viewer.dev/license
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+
+.layer {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    /* Custom elements added to the page layer can be positioned outside of the page */
+    overflow: visible;
+    position: relative;
+
+    &::after {
+        content: '';
+        position: absolute;
+        /* Position */
+        bottom: 0.25rem;
+        left: 0.25rem;
+        right: 0.25rem;
+        top: 0.25rem;
+        box-shadow:
+            rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+            rgba(0, 0, 0, 0) 0px 0px 0px 0px,
+            rgba(0, 0, 0, 0.1) 0px 1px 3px 0px,
+            rgba(0, 0, 0, 0.1) 0px 1px 2px -1px;
+    }
+}
+
+.layerSingle {
+    margin: 0 auto;
+}

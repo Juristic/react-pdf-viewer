@@ -15,6 +15,7 @@ import { useIsMounted } from '../hooks/useIsMounted';
 import { useSafeState } from '../hooks/useSafeState';
 import { RotateDirection } from '../structs/RotateDirection';
 import { ViewMode } from '../structs/ViewMode';
+import styles from '../styles/pageLayer.module.css';
 import { type Destination } from '../types/Destination';
 import { type PageSize } from '../types/PageSize';
 import { type PdfJs } from '../types/PdfJs';
@@ -28,7 +29,7 @@ import { TextLayer } from './TextLayer';
 
 export const PageLayer: React.FC<{
     doc: PdfJs.PdfDocument;
-    measureRef: (ele: HTMLElement) => void;
+    measureRef: React.RefCallback<HTMLElement>;
     outlines: PdfJs.Outline[];
     pageIndex: number;
     pageRotation: number;
@@ -66,11 +67,11 @@ export const PageLayer: React.FC<{
     onRotatePage,
 }) => {
     const isMountedRef = useIsMounted();
-    const [page, setPage] = useSafeState<PdfJs.Page>(null);
+    const [page, setPage] = useSafeState<PdfJs.Page | null>(null);
     const [canvasLayerRendered, setCanvasLayerRendered] = useSafeState(false);
     const [textLayerRendered, setTextLayerRendered] = useSafeState(false);
-    const canvasLayerRef = React.useRef<HTMLCanvasElement>();
-    const textLayerRef = React.useRef<HTMLDivElement>();
+    const canvasLayerRef = React.useRef<HTMLCanvasElement>(null);
+    const textLayerRef = React.useRef<HTMLDivElement>(null);
 
     const isVertical = Math.abs(rotation + pageRotation) % 180 === 0;
     const scaledWidth = pageSize.pageWidth * scale;
@@ -158,10 +159,8 @@ export const PageLayer: React.FC<{
     return (
         <div
             className={classNames({
-                'rpv-core__page-layer': true,
-                'rpv-core__page-layer--dual': viewMode === ViewMode.DualPage,
-                'rpv-core__page-layer--dual-cover': viewMode === ViewMode.DualPageWithCover,
-                'rpv-core__page-layer--single': viewMode === ViewMode.SinglePage,
+                [styles.layer]: true,
+                [styles.layerSingle]: viewMode === ViewMode.SinglePage,
             })}
             data-testid={`core__page-layer-${pageIndex}`}
             ref={measureRef}

@@ -11,6 +11,7 @@
 import { type Store } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { getImageFromArea } from './getImageFromArea';
+import styles from './styles/clickDrag.module.css';
 import { HighlightState, HighlightStateType, NO_SELECTION_STATE } from './types/HighlightState';
 import { type StoreProps } from './types/StoreProps';
 
@@ -24,14 +25,14 @@ interface Offset {
 }
 
 export const ClickDrag: React.FC<{
-    canvasLayerRef: React.MutableRefObject<HTMLCanvasElement>;
+    canvasLayerRef: React.RefObject<HTMLCanvasElement>;
     canvasLayerRendered: boolean;
     pageIndex: number;
     store: Store<StoreProps>;
-    textLayerRef: React.MutableRefObject<HTMLDivElement>;
+    textLayerRef: React.RefObject<HTMLDivElement>;
     textLayerRendered: boolean;
 }> = ({ canvasLayerRef, canvasLayerRendered, pageIndex, store, textLayerRef, textLayerRendered }) => {
-    const containerRef = React.useRef<HTMLDivElement>();
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const currentCursorRef = React.useRef(document.body.style.cursor);
     const startPointRef = React.useRef<Point>({ x: 0, y: 0 });
     const offsetRef = React.useRef<Offset>({ top: 0, left: 0 });
@@ -39,7 +40,7 @@ export const ClickDrag: React.FC<{
     const hideContainer = () => {
         const container = containerRef.current;
         if (container) {
-            container.classList.add('rpv-highlight__click-drag--hidden');
+            container.classList.add(styles.clickDragHidden);
         }
     };
 
@@ -93,8 +94,8 @@ export const ClickDrag: React.FC<{
         };
         const rect = textLayerEle.getBoundingClientRect();
 
-        if (container.classList.contains('rpv-highlight__click-drag--hidden')) {
-            container.classList.remove('rpv-highlight__click-drag--hidden');
+        if (container.classList.contains(styles.clickDragHidden)) {
+            container.classList.remove(styles.clickDragHidden);
         }
 
         // Prevent users from dragging out of the page
@@ -106,7 +107,7 @@ export const ClickDrag: React.FC<{
     };
 
     const handleDocumentKeyDown = (e: KeyboardEvent) => {
-        if (e.key === 'Escape' && store.get('highlightState').type === HighlightStateType.ClickDragged) {
+        if (e.key === 'Escape' && store.get('highlightState')!.type === HighlightStateType.ClickDragged) {
             e.preventDefault();
             hideContainer();
             store.update('highlightState', NO_SELECTION_STATE);
@@ -119,7 +120,7 @@ export const ClickDrag: React.FC<{
         if (!container) {
             return;
         }
-        const highlightType = store.get('highlightState').type;
+        const highlightType = store.get('highlightState')!.type;
         if (highlightType === HighlightStateType.NoSelection && e.target !== container) {
             hideContainer();
         }
@@ -205,5 +206,5 @@ export const ClickDrag: React.FC<{
         };
     }, [textLayerRendered]);
 
-    return <div ref={containerRef} className="rpv-highlight__click-drag rpv-highlight__click-drag--hidden" />;
+    return <div ref={containerRef} className={`${styles.clickDrag} ${styles.clickDragHidden}`} />;
 };

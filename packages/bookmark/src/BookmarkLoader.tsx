@@ -10,7 +10,6 @@
 
 import {
     LocalizationContext,
-    Spinner,
     TextDirection,
     ThemeContext,
     classNames,
@@ -20,6 +19,8 @@ import {
 } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { BookmarkListRoot } from './BookmarkListRoot';
+import { BookmarkSkeleton } from './BookmarkSkeleton';
+import styles from './styles/bookmarkListLoader.module.css';
 import { type IsBookmarkExpanded } from './types/IsBookmarkExpanded';
 import { type RenderBookmarkItem } from './types/RenderBookmarkItemProps';
 import { type StoreProps } from './types/StoreProps';
@@ -30,7 +31,7 @@ interface BookmarkState {
 }
 
 export const BookmarkLoader: React.FC<{
-    doc: PdfJs.PdfDocument;
+    doc?: PdfJs.PdfDocument;
     isBookmarkExpanded?: IsBookmarkExpanded;
     renderBookmarkItem?: RenderBookmarkItem;
     store: Store<StoreProps>;
@@ -44,6 +45,9 @@ export const BookmarkLoader: React.FC<{
     });
 
     React.useEffect(() => {
+        if (!doc) {
+            return;
+        }
         setBookmarks({
             isLoaded: false,
             items: [],
@@ -56,16 +60,14 @@ export const BookmarkLoader: React.FC<{
         });
     }, [doc]);
 
-    return !bookmarks.isLoaded ? (
-        <div className="rpv-bookmark__loader">
-            <Spinner />
-        </div>
+    return !doc || !bookmarks.isLoaded ? (
+        <BookmarkSkeleton />
     ) : bookmarks.items.length === 0 ? (
         <div
             data-testid="bookmark__empty"
             className={classNames({
-                'rpv-bookmark__empty': true,
-                'rpv-bookmark__empty--rtl': isRtl,
+                [styles.empty]: true,
+                [styles.emptyRtl]: isRtl,
             })}
         >
             {l10n && l10n.bookmark ? ((l10n.bookmark as LocalizationMap).noBookmark as string) : 'There is no bookmark'}
@@ -74,8 +76,8 @@ export const BookmarkLoader: React.FC<{
         <div
             data-testid="bookmark__container"
             className={classNames({
-                'rpv-bookmark__container': true,
-                'rpv-bookmark__container--rtl': isRtl,
+                [styles.container]: true,
+                [styles.containerRtl]: isRtl,
             })}
         >
             <BookmarkListRoot

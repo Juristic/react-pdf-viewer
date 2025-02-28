@@ -28,6 +28,7 @@ import {
 } from '@react-pdf-viewer/toolbar';
 import * as React from 'react';
 import { Sidebar, SidebarTab } from './Sidebar';
+import styles from './styles/defaultLayout.module.css';
 import { type StoreProps } from './types/StoreProps';
 
 export interface DefaultLayoutPlugin extends Plugin {
@@ -52,7 +53,7 @@ export const defaultLayoutPlugin = (props?: DefaultLayoutPluginProps): DefaultLa
         () =>
             createStore<StoreProps>({
                 isCurrentTabOpened: false,
-                currentTab: 0,
+                currentTab: -1,
             }),
         [],
     );
@@ -102,13 +103,12 @@ export const defaultLayoutPlugin = (props?: DefaultLayoutPluginProps): DefaultLa
                     : {};
 
             slot.children = (
-                <div className="rpv-default-layout__container">
+                <div className={styles.container}>
                     <div
                         data-testid="default-layout__main"
                         className={classNames({
-                            'rpv-default-layout__main': true,
-                            'rpv-default-layout__main--rtl':
-                                renderProps.themeContext.direction === TextDirection.RightToLeft,
+                            [styles.main]: true,
+                            [styles.mainRtl]: renderProps.themeContext.direction === TextDirection.RightToLeft,
                         })}
                     >
                         <Sidebar
@@ -118,11 +118,11 @@ export const defaultLayoutPlugin = (props?: DefaultLayoutPluginProps): DefaultLa
                             thumbnailTabContent={<Thumbnails />}
                             tabs={sidebarTabs}
                         />
-                        <div className="rpv-default-layout__body" data-testid="default-layout__body">
-                            <div className="rpv-default-layout__toolbar">
+                        <div className={styles.body} data-testid="default-layout__body">
+                            <div className={styles.toolbar}>
                                 {props && props.renderToolbar ? props.renderToolbar(Toolbar) : <Toolbar />}
                             </div>
-                            <div {...mergeSubSlot}>{slot.subSlot.children}</div>
+                            <div {...mergeSubSlot}>{slot.subSlot!.children}</div>
                         </div>
                     </div>
                     {slot.children}
@@ -130,8 +130,8 @@ export const defaultLayoutPlugin = (props?: DefaultLayoutPluginProps): DefaultLa
             );
 
             // Reset the sub slot
-            slot.subSlot.attrs = {};
-            slot.subSlot.children = <></>;
+            slot.subSlot!.attrs = {};
+            slot.subSlot!.children = <></>;
 
             return slot;
         },

@@ -1,0 +1,15 @@
+/**
+ * A React component to view a PDF document
+ *
+ * @see https://react-pdf-viewer.dev
+ * @license https://react-pdf-viewer.dev/license
+ * @copyright 2019-2024 Nguyen Huu Phuoc <me@phuoc.ng>
+ */
+
+.layer {
+    /*
+     * Make it displayed on top of the shadow layer
+     * so users can interact with the annotations (for example, follow links)
+     */
+    z-index: 1;
+}

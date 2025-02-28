@@ -10,6 +10,7 @@
 
 import { FullScreenMode, Spinner, type Store } from '@react-pdf-viewer/core';
 import * as React from 'react';
+import styles from './styles/overlay.module.css';
 import { type StoreProps } from './types/StoreProps';
 import { type Zoom } from './types/Zoom';
 
@@ -25,11 +26,17 @@ export const FullScreenModeTracker: React.FC<{
     }, []);
 
     const handleEnteredFullScreen = () => {
-        onEnterFullScreen(store.get('zoom'));
+        const zoom = store.get('zoom');
+        if (zoom) {
+            onEnterFullScreen(zoom);
+        }
     };
 
     const handleExitedFullScreen = () => {
-        onExitFullScreen(store.get('zoom'));
+        const zoom = store.get('zoom');
+        if (zoom) {
+            onExitFullScreen(zoom);
+        }
     };
 
     React.useEffect(() => {
@@ -55,7 +62,7 @@ export const FullScreenModeTracker: React.FC<{
 
     return (
         fullScreenMode === FullScreenMode.Entering && (
-            <div className="rpv-full-screen__overlay">
+            <div className={styles.overlay}>
                 <Spinner />
             </div>
         )

@@ -10,6 +10,7 @@
 
 import * as React from 'react';
 import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
+import styles from '../styles/annotationLayer.module.css';
 import { type Destination } from '../types/Destination';
 import { type PdfJs } from '../types/PdfJs';
 import { type Plugin } from '../types/Plugin';
@@ -57,7 +58,7 @@ export const AnnotationLayerBody: React.FC<{
     onJumpFromLinkAnnotation,
     onJumpToDest,
 }) => {
-    const containerRef = React.useRef<HTMLDivElement>();
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const viewport = page.getViewport({ rotation, scale });
     const clonedViewPort = viewport.clone({ dontFlip: true });
 
@@ -93,11 +94,7 @@ export const AnnotationLayerBody: React.FC<{
     }, []);
 
     return (
-        <div
-            ref={containerRef}
-            className="rpv-core__annotation-layer"
-            data-testid={`core__annotation-layer-${pageIndex}`}
-        >
+        <div ref={containerRef} className={styles.layer} data-testid={`core__annotation-layer-${pageIndex}`}>
             {filterAnnotations.map((annotation) => {
                 const childAnnotation = annotations.find((item) => item.parentId === annotation.id);
                 switch (annotation.annotationType) {

@@ -11,6 +11,7 @@
 import { Spinner, type PdfJs, type Store, type StoreHandler } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { CoverInner } from './CoverInner';
+import styles from './styles/cover.module.css';
 import { StoreProps } from './types/StoreProps';
 
 export const Cover: React.FC<{
@@ -19,7 +20,7 @@ export const Cover: React.FC<{
     store: Store<StoreProps>;
     width?: number;
 }> = ({ getPageIndex, renderSpinner, store, width }) => {
-    const [currentDoc, setCurrentDoc] = React.useState<PdfJs.PdfDocument>(store.get('doc'));
+    const [currentDoc, setCurrentDoc] = React.useState<PdfJs.PdfDocument>(store.get('doc')!);
 
     const handleDocumentChanged: StoreHandler<PdfJs.PdfDocument> = (doc: PdfJs.PdfDocument) => {
         setCurrentDoc(doc);
@@ -34,7 +35,7 @@ export const Cover: React.FC<{
     }, []);
 
     return (
-        <div className="rpv-thumbnail__cover">
+        <div className={styles.cover}>
             {currentDoc ? (
                 <CoverInner
                     doc={currentDoc}
@@ -44,7 +45,7 @@ export const Cover: React.FC<{
                     width={width}
                 />
             ) : (
-                <div className="rpv-thumbnail__cover-loader">{renderSpinner ? renderSpinner() : <Spinner />}</div>
+                <div className={styles.loader}>{renderSpinner ? renderSpinner() : <Spinner />}</div>
             )}
         </div>
     );

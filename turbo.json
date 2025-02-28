@@ -1,11 +1,13 @@
 {
     "$schema": "https://turbo.build/schema.json",
-    "pipeline": {
-        "build": {
-            "dependsOn": ["^build"]
+    "tasks": {
+        "js": {
+            "cache": false,
+            "dependsOn": ["^js"]
         },
-        "clean": {
-            "dependsOn": ["^clean"]
+        "css": {
+            "cache": false,
+            "dependsOn": ["^css"]
         },
         "release": {
             "dependsOn": ["^release"]

@@ -12,7 +12,6 @@ import * as React from 'react';
 import { useFullScreen } from '../fullscreen/useFullScreen';
 import { useAnimationFrame } from '../hooks/useAnimationFrame';
 import { useDebounceCallback } from '../hooks/useDebounceCallback';
-import { useIsomorphicLayoutEffect } from '../hooks/useIsomorphicLayoutEffect';
 import { useRenderQueue } from '../hooks/useRenderQueue';
 import { useTrackResize } from '../hooks/useTrackResize';
 import { PageLayer } from '../layers/PageLayer';
@@ -22,6 +21,7 @@ import { RotateDirection } from '../structs/RotateDirection';
 import { ScrollMode } from '../structs/ScrollMode';
 import { SpecialZoomLevel } from '../structs/SpecialZoomLevel';
 import { ViewMode } from '../structs/ViewMode';
+import styles from '../styles/inner.module.css';
 import { TextDirection, ThemeContext } from '../theme/ThemeContext';
 import { type Destination } from '../types/Destination';
 import { type DocumentLoadEvent } from '../types/DocumentLoadEvent';
@@ -112,8 +112,8 @@ export const Inner: React.FC<{
     const { l10n } = React.useContext(LocalizationContext);
     const themeContext = React.useContext(ThemeContext);
     const isRtl = themeContext.direction === TextDirection.RightToLeft;
-    const containerRef = React.useRef<HTMLDivElement>();
-    const pagesRef = React.useRef<HTMLDivElement>();
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const pagesRef = React.useRef<HTMLDivElement>(null);
 
     // Manage visited destinations
     const destinationManager = useDestination({
@@ -193,7 +193,9 @@ export const Inner: React.FC<{
                         height: rect.height * scale,
                         width: rect.width * scale,
                     };
-                    return layoutBuilder.transformSize({ numPages, pageIndex, size: pageRect });
+                    return layoutBuilder.transformSize
+                        ? layoutBuilder.transformSize({ numPages, pageIndex, size: pageRect })
+                        : pageRect;
                 }),
         [rotation, scale, pageSizes],
     );
@@ -253,7 +255,7 @@ export const Inner: React.FC<{
         stateRef.current = newState;
     };
 
-    const getPagesContainer = () => pagesRef.current;
+    const getPagesContainer = () => pagesRef.current!;
 
     const getViewerState = () => stateRef.current;
 
@@ -314,18 +316,22 @@ export const Inner: React.FC<{
         [onOpenFile],
     );
 
+    const normalizeRotation = (rotation: number): number => {
+        return rotation < 0 ? 360 + rotation : rotation >= 360 ? rotation - 360 : rotation;
+    };
+
     const rotate = React.useCallback((direction: RotateDirection) => {
         const rotation = stateRef.current.rotation;
         const degrees = direction === RotateDirection.Backward ? -90 : 90;
-        const updateRotation = rotation === 360 || rotation === -360 ? degrees : rotation + degrees;
+        const finalRotation = normalizeRotation(rotation + degrees);
 
         renderQueue.markNotRendered();
-        setRotation(updateRotation);
+        setRotation(finalRotation);
         setViewerState({
             ...stateRef.current,
-            rotation: updateRotation,
+            rotation: finalRotation,
         });
-        onRotate({ direction, doc, rotation: updateRotation });
+        onRotate({ direction, doc, rotation: finalRotation });
         // Keep the current page after rotating the document
         forceTargetPageRef.current = {
             targetPage: stateRef.current.pageIndex,
@@ -336,8 +342,8 @@ export const Inner: React.FC<{
     const rotatePage = React.useCallback((pageIndex: number, direction: RotateDirection) => {
         const degrees = direction === RotateDirection.Backward ? -90 : 90;
         const rotations = stateRef.current.pagesRotation;
-        const currentPageRotation = rotations.has(pageIndex) ? rotations.get(pageIndex) : initialRotation;
-        const finalRotation = currentPageRotation + degrees;
+        const currentPageRotation = rotations.has(pageIndex) ? rotations.get(pageIndex)! : initialRotation;
+        const finalRotation = normalizeRotation(currentPageRotation + degrees);
         const updateRotations = rotations.set(pageIndex, finalRotation);
 
         // Force the pages to be re-virtualized
@@ -781,7 +787,7 @@ export const Inner: React.FC<{
             l10n && l10n.core ? ((l10n.core as LocalizationMap).pageLabel as string) : 'Page {{pageIndex}}';
         let slot: Slot = {
             attrs: {
-                className: 'rpv-core__inner-container',
+                className: styles.container,
                 'data-testid': 'core__inner-container',
                 ref: containerRef,
                 style: {
@@ -793,10 +799,10 @@ export const Inner: React.FC<{
                 attrs: {
                     'data-testid': 'core__inner-pages',
                     className: classNames({
-                        'rpv-core__inner-pages': true,
+                        [styles.pages]: true,
                         'rpv-core__inner-pages--horizontal': scrollMode === ScrollMode.Horizontal,
-                        'rpv-core__inner-pages--rtl': isRtl,
-                        'rpv-core__inner-pages--single': scrollMode === ScrollMode.Page,
+                        [styles.pagesRtl]: isRtl,
+                        [styles.pagesSingle]: scrollMode === ScrollMode.Page,
                         'rpv-core__inner-pages--vertical': scrollMode === ScrollMode.Vertical,
                         'rpv-core__inner-pages--wrapped': scrollMode === ScrollMode.Wrapped,
                     }),
@@ -822,8 +828,7 @@ export const Inner: React.FC<{
                         {chunks.map((items) => (
                             <div
                                 className={classNames({
-                                    'rpv-core__inner-page-container': true,
-                                    'rpv-core__inner-page-container--single': scrollMode === ScrollMode.Page,
+                                    [styles.pageContainerSingle]: scrollMode === ScrollMode.Page,
                                 })}
                                 style={virtualizer.getItemContainerStyles(items[0])}
                                 key={`${items[0].index}-${viewMode}-${scrollMode}`}
@@ -837,21 +842,20 @@ export const Inner: React.FC<{
                                         <div
                                             aria-label={pageLabel.replace('{{pageIndex}}', `${item.index + 1}`)}
                                             className={classNames({
-                                                'rpv-core__inner-page': true,
-                                                'rpv-core__inner-page--dual-even':
+                                                [styles.pageDualEven]:
                                                     viewMode === ViewMode.DualPage && item.index % 2 === 0,
-                                                'rpv-core__inner-page--dual-odd':
+                                                [styles.pageDualOdd]:
                                                     viewMode === ViewMode.DualPage && item.index % 2 === 1,
-                                                'rpv-core__inner-page--dual-cover': isCover,
-                                                'rpv-core__inner-page--dual-cover-even':
+                                                [styles.pageDualCover]: isCover,
+                                                [styles.pageDualCoverEven]:
                                                     viewMode === ViewMode.DualPageWithCover &&
                                                     !isCover &&
                                                     item.index % 2 === 0,
-                                                'rpv-core__inner-page--dual-cover-odd':
+                                                [styles.pageDualCoverOdd]:
                                                     viewMode === ViewMode.DualPageWithCover &&
                                                     !isCover &&
                                                     item.index % 2 === 1,
-                                                'rpv-core__inner-page--single':
+                                                [styles.pageSingle]:
                                                     viewMode === ViewMode.SinglePage && scrollMode === ScrollMode.Page,
                                             })}
                                             role="region"
@@ -859,12 +863,14 @@ export const Inner: React.FC<{
                                             style={Object.assign(
                                                 {},
                                                 virtualizer.getItemStyles(item),
-                                                layoutBuilder.buildPageStyles({
-                                                    numPages,
-                                                    pageIndex: item.index,
-                                                    scrollMode,
-                                                    viewMode,
-                                                }),
+                                                layoutBuilder.buildPageStyles
+                                                    ? layoutBuilder.buildPageStyles({
+                                                          numPages,
+                                                          pageIndex: item.index,
+                                                          scrollMode,
+                                                          viewMode,
+                                                      })
+                                                    : {},
                                             )}
                                         >
                                             <PageLayer

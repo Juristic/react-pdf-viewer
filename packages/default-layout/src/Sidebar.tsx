@@ -24,6 +24,7 @@ import {
 import * as React from 'react';
 import { BookmarkIcon } from './BookmarkIcon';
 import { FileIcon } from './FileIcon';
+import styles from './styles/sidebar.module.css';
 import { ThumbnailIcon } from './ThumbnailIcon';
 import { type StoreProps } from './types/StoreProps';
 
@@ -48,10 +49,10 @@ export const Sidebar: React.FC<SidebarProps> = ({
     thumbnailTabContent,
     tabs,
 }) => {
-    const containerRef = React.useRef<HTMLDivElement>();
+    const containerRef = React.useRef<HTMLDivElement>(null);
     const { l10n } = React.useContext(LocalizationContext);
     const [opened, setOpened] = React.useState(store.get('isCurrentTabOpened') || false);
-    const [currentTab, setCurrentTab] = React.useState(Math.max(store.get('currentTab') || 0, 0));
+    const [currentTab, setCurrentTab] = React.useState(store.get('currentTab')!);
     const { direction } = React.useContext(ThemeContext);
     const isRtl = direction === TextDirection.RightToLeft;
 
@@ -130,21 +131,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
             <div
                 data-testid="default-layout__sidebar"
                 className={classNames({
-                    'rpv-default-layout__sidebar': true,
-                    'rpv-default-layout__sidebar--opened': opened,
-                    'rpv-default-layout__sidebar--ltr': !isRtl,
-                    'rpv-default-layout__sidebar--rtl': isRtl,
+                    [styles.sidebar]: true,
+                    [styles.sidebarOpened]: opened,
+                    [styles.sidebarLtr]: !isRtl,
+                    [styles.sidebarRtl]: isRtl,
                 })}
                 ref={containerRef}
             >
-                <div className="rpv-default-layout__sidebar-tabs">
-                    <div className="rpv-default-layout__sidebar-headers" role="tablist" aria-orientation="vertical">
+                <div className={styles.tabs}>
+                    <div className={styles.headers} role="tablist" aria-orientation="vertical">
                         {listTabs.map((tab, index) => (
                             <div
                                 aria-controls="rpv-default-layout__sidebar-content"
                                 aria-selected={currentTab === index}
                                 key={index}
-                                className="rpv-default-layout__sidebar-header"
+                                className={styles.header}
                                 id={`rpv-default-layout__sidebar-tab-${index}`}
                                 role="tab"
                             >
@@ -165,20 +166,22 @@ export const Sidebar: React.FC<SidebarProps> = ({
                             </div>
                         ))}
                     </div>
-                    <div
-                        aria-labelledby={`rpv-default-layout__sidebar-tab-${currentTab}`}
-                        id="rpv-default-layout__sidebar-content"
-                        className={classNames({
-                            'rpv-default-layout__sidebar-content': true,
-                            'rpv-default-layout__sidebar-content--opened': opened,
-                            'rpv-default-layout__sidebar-content--ltr': !isRtl,
-                            'rpv-default-layout__sidebar-content--rtl': isRtl,
-                        })}
-                        role="tabpanel"
-                        tabIndex={-1}
-                    >
-                        {listTabs[currentTab].content}
-                    </div>
+                    {currentTab >= 0 && (
+                        <div
+                            aria-labelledby={`rpv-default-layout__sidebar-tab-${currentTab}`}
+                            id="rpv-default-layout__sidebar-content"
+                            className={classNames({
+                                [styles.content]: true,
+                                [styles.contentOpened]: opened,
+                                [styles.contentLtr]: !isRtl,
+                                [styles.contentRtl]: isRtl,
+                            })}
+                            role="tabpanel"
+                            tabIndex={-1}
+                        >
+                            {listTabs[currentTab].content}
+                        </div>
+                    )}
                 </div>
             </div>
             {opened && <Splitter constrain={resizeConstrain} />}

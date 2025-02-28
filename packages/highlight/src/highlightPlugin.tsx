@@ -25,6 +25,7 @@ import { HighlightAreaList } from './HighlightAreaList';
 import { Tracker } from './Tracker';
 import { HIGHLIGHT_LAYER_ATTR, HIGHLIGHT_PAGE_ATTR } from './constants';
 import { Trigger } from './structs/Trigger';
+import styles from './styles/selectedText.module.css';
 import { type HighlightArea } from './types/HighlightArea';
 import { HighlightStateType, NO_SELECTION_STATE, SELECTING_STATE } from './types/HighlightState';
 import { type RenderHighlightContentProps } from './types/RenderHighlightContentProps';
@@ -44,7 +45,7 @@ export interface HighlightPluginProps {
     trigger?: Trigger;
 }
 
-const TEXT_LAYER_END_SELECTOR = 'rpv-highlight__selected-end';
+const TEXT_LAYER_END_SELECTOR = styles.selectedEnd;
 
 export const highlightPlugin = (props?: HighlightPluginProps): HighlightPlugin => {
     const highlightPluginProps = Object.assign({}, { trigger: Trigger.TextSelection }, props);
@@ -80,6 +81,10 @@ export const highlightPlugin = (props?: HighlightPluginProps): HighlightPlugin =
         const textLayer = textLayerRender.ele;
         const pageRect = textLayer.getBoundingClientRect();
         const highlightState = store.get('highlightState');
+        if (!highlightState) {
+            return;
+        }
+
         if (highlightState.type === HighlightStateType.Selected) {
             const mouseTop = e.clientY - pageRect.top;
             const mouseLeft = e.clientX - pageRect.left;
@@ -96,7 +101,7 @@ export const highlightPlugin = (props?: HighlightPluginProps): HighlightPlugin =
                 });
             if (userClickedInsideArea) {
                 // Cancel the selection
-                window.getSelection().removeAllRanges();
+                window.getSelection()?.removeAllRanges();
                 store.update('highlightState', NO_SELECTION_STATE);
             } else {
                 store.update('highlightState', SELECTING_STATE);
@@ -153,7 +158,8 @@ export const highlightPlugin = (props?: HighlightPluginProps): HighlightPlugin =
             if (!textEle.querySelector(`.${TEXT_LAYER_END_SELECTOR}`)) {
                 const selectEnd = document.createElement('div');
                 selectEnd.classList.add(TEXT_LAYER_END_SELECTOR);
-                selectEnd.classList.add('rpv-core__text-layer-text--not');
+                // To distinguish with other text items
+                selectEnd.setAttribute('data-text', 'false');
                 textEle.appendChild(selectEnd);
             }
         }

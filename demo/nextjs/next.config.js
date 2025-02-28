@@ -1,8 +1,6 @@
 const path = require('path');
-const CopyWebpackPlugin = require('copy-webpack-plugin');
 
 module.exports = {
-    reactStrictMode: true,
     async rewrites() {
         return [
             {
@@ -15,7 +13,31 @@ module.exports = {
             },
         ];
     },
-    webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
+    reactStrictMode: true,
+    transpilePackages: [
+        '@react-pdf-viewer/attachment',
+        '@react-pdf-viewer/bookmark',
+        '@react-pdf-viewer/core',
+        '@react-pdf-viewer/default-layout',
+        '@react-pdf-viewer/drop',
+        '@react-pdf-viewer/full-screen',
+        '@react-pdf-viewer/get-file',
+        '@react-pdf-viewer/highlight',
+        '@react-pdf-viewer/locale-switcher',
+        '@react-pdf-viewer/open',
+        '@react-pdf-viewer/page-navigation',
+        '@react-pdf-viewer/print',
+        '@react-pdf-viewer/properties',
+        '@react-pdf-viewer/rotate',
+        '@react-pdf-viewer/scroll-mode',
+        '@react-pdf-viewer/search',
+        '@react-pdf-viewer/selection-mode',
+        '@react-pdf-viewer/theme',
+        '@react-pdf-viewer/thumbnail',
+        '@react-pdf-viewer/toolbar',
+        '@react-pdf-viewer/zoom',
+    ],
+    webpack: (config) => {
         const rootDir = path.join(__dirname, '../..');
 
         // We need it because we use the local development version of `@react-pdf-viewer/xxx`
@@ -23,57 +45,16 @@ module.exports = {
         config.resolve.alias['react'] = path.join(rootDir, 'node_modules/react');
 
         // Be able to compile TypeScript files
-        const tsLoader = {
+        config.module.rules.push({
             test: /\.ts(x?)$/,
             include: [path.join(rootDir, 'packages')],
             exclude: /node_modules/,
             use: ['ts-loader'],
-        };
-        config.module.rules.push(tsLoader);
+        });
 
-        // Indicate the package source based on the name
-        // So we don't have to map them manually in the `alias` option as
-        //  alias: {
-        //      '@react-pdf-viewer/core/lib/styles.css': path.join(__dirname, '../../packages/core/lib/styles.css'),
-        //      '@react-pdf-viewer/core': path.join(__dirname, '../../packages/core/src'),
-        //      ...
-        //  }
-        const mapPlugin = new webpack.NormalModuleReplacementPlugin(
-            // The pattern covers the package and its CSS
-            // @react-pdf-viewer/core
-            // @react-pdf-viewer/core/lib/styles/index.css
-            /^@react-pdf-viewer\/[a-z-]+[\/lib\/styles]*[\/index.(css)]*$/,
-            (resource) => {
-                const request = resource.request;
-                const pkgName = request.split('/')[1];
-
-                switch (true) {
-                    case request.endsWith('.css'):
-                        resource.request = path.join(rootDir, `packages/${pkgName}/src/styles/index.scss`);
-                        break;
-
-                    default:
-                        resource.request = path.join(rootDir, `packages/${pkgName}/src`);
-                        break;
-                }
-            },
-        );
         config.externals.push({
             canvas: 'canvas',
         });
-        config.plugins.push(mapPlugin);
-
-        // Copy pdfjs worker to `public`
-        config.plugins.push(
-            new CopyWebpackPlugin({
-                patterns: [
-                    {
-                        from: path.join(rootDir, 'node_modules/pdfjs-dist/build/pdf.worker.min.mjs'),
-                        to: path.join(__dirname, 'public'),
-                    },
-                ],
-            }),
-        );
 
         return config;
     },

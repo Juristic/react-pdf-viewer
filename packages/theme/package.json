@@ -25,7 +25,7 @@
         "url": "https://github.com/react-pdf-viewer/react-pdf-viewer/issues"
     },
     "main": "lib/index.js",
-    "types": "lib/index.d.ts",
+    "types": "lib/@types/index.d.ts",
     "files": [
         "lib/cjs/*.js",
         "lib/index.d.ts",
@@ -42,8 +42,7 @@
         "access": "public"
     },
     "scripts": {
-        "clean": "rm -rf lib && mkdir lib",
-        "build": "npm run clean && cp src/index.d.ts lib && cp dist/index.js lib && rollup -c ../../rollup.config.cjs",
+        "js": "tsx ../../scripts/buildJs",
         "test": "jest --config ../../jest.config.js",
         "release": "npm publish --access public"
     }

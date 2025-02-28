@@ -1,7 +1,7 @@
 import { ScrollMode, ViewMode, Viewer } from '@react-pdf-viewer/core';
 import '@react-pdf-viewer/core/lib/styles/index.css';
-import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
+import { defaultLayoutPlugin } from '@react-pdf-viewer/default-layout';
 import * as React from 'react';
 
 const App = () => {
@@ -11,8 +11,8 @@ const App = () => {
         <div
             style={{
                 height: '50rem',
-                width: '50rem',
                 margin: '1rem auto',
+                maxWidth: '50rem',
             }}
         >
             <Viewer

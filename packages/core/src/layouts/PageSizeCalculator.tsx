@@ -13,6 +13,7 @@ import { Spinner } from '../components/Spinner';
 import { ScrollMode } from '../structs/ScrollMode';
 import { SpecialZoomLevel } from '../structs/SpecialZoomLevel';
 import { ViewMode } from '../structs/ViewMode';
+import styles from '../styles/pageSizeCalculator.module.css';
 import { type PageSize } from '../types/PageSize';
 import { type PdfJs } from '../types/PdfJs';
 import { getPage } from '../utils/managePages';
@@ -32,7 +33,7 @@ export const PageSizeCalculator: React.FC<{
     scrollMode: ScrollMode;
     viewMode: ViewMode;
 }> = ({ defaultScale, doc, render, scrollMode, viewMode }) => {
-    const pagesRef = React.useRef<HTMLDivElement>();
+    const pagesRef = React.useRef<HTMLDivElement>(null);
     const [state, setState] = React.useState<{
         estimatedPageSizes: PageSize[];
         scale: number;
@@ -58,6 +59,9 @@ export const PageSizeCalculator: React.FC<{
             // The `pagesRef` element will be destroyed when the size calculation is completed
             // To make it more easy for testing, we take the parent element which is always visible
             const parentEle = pagesEle.parentElement;
+            if (!parentEle) {
+                return;
+            }
 
             // Determine the best scale that fits the document within the container
             const scaleWidth = (parentEle.clientWidth - RESERVE_WIDTH) / w;
@@ -93,7 +97,7 @@ export const PageSizeCalculator: React.FC<{
     }, [doc.loadingTask.docId]);
 
     return state.estimatedPageSizes.length === 0 || state.scale === 0 ? (
-        <div className="rpv-core__page-size-calculator" data-testid="core__page-size-calculating" ref={pagesRef}>
+        <div className={styles.container} data-testid="core__page-size-calculating" ref={pagesRef}>
             <Spinner />
         </div>
     ) : (
