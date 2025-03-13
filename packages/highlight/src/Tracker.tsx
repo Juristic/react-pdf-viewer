@@ -83,6 +83,8 @@ export const Tracker: React.FC<{
             return;
         }
 
+        if (startDiv == null) return;
+
         const startPageIndex = parseInt(startDiv.getAttribute(HIGHLIGHT_PAGE_ATTR) || '', 10);
         const endPageIndex = parseInt(endDiv.getAttribute(HIGHLIGHT_PAGE_ATTR) || '', 10);
 
@@ -114,12 +116,16 @@ export const Tracker: React.FC<{
                 break;
         }
 
-        const getRectBetween = (min: number, max: number, eleArray: HTMLElement[]) =>
-            Array(max - min + 1)
+        const getRectBetween = (min: number, max: number, eleArray: HTMLElement[]) => {
+            if (min < 0 || max < 0) return [];
+
+            return Array(Math.max(max, 1) - Math.max(min, 0) + 1)
                 .fill(0)
                 .map((_, i) => eleArray[min + i].getBoundingClientRect());
+        };
 
         let highlightAreas: HighlightArea[] = [];
+
         switch (rangeType) {
             case SelectionRange.SameDiv:
                 // eslint-disable-next-line no-case-declarations
@@ -139,6 +145,7 @@ export const Tracker: React.FC<{
                 break;
 
             case SelectionRange.DifferentDivs:
+                if (endDiv == null) break;
                 highlightAreas = [getRectFromOffsets(startDiv, startOffset, startDiv.textContent!.length)]
                     .concat(getRectBetween(startDivIndex + 1, endDivIndex - 1, startDivSiblings))
                     .concat([getRectFromOffsets(endDiv, 0, endOffset)])
@@ -157,6 +164,7 @@ export const Tracker: React.FC<{
                 break;
 
             case SelectionRange.DifferentPages:
+                if (endDiv == null) break;
                 // eslint-disable-next-line no-case-declarations
                 const startAreas = [getRectFromOffsets(startDiv, startOffset, startDiv.textContent!.length)]
                     .concat(getRectBetween(startDivIndex + 1, startDivSiblings.length - 1, startDivSiblings))
@@ -174,7 +182,7 @@ export const Tracker: React.FC<{
                     });
                 // eslint-disable-next-line no-case-declarations
                 const endAreas = getRectBetween(0, endDivIndex - 1, endDivSiblings)
-                    .concat([getRectFromOffsets(endDiv, 0, endOffset)])
+                    .concat([getRectFromOffsets(endDiv, 0, endOffset) as DOMRect])
                     .filter((rect) => rect !== null)
                     .map((rect) => {
                         return {

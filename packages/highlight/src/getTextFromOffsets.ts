@@ -47,13 +47,28 @@ export const getTextFromOffsets = (
             wholeText,
         };
     } else {
+        if (!nodes.length) {
+            return {
+                divTexts: [
+                    {
+                        divIndex: startDivIdx,
+                        pageIndex,
+                        textContent: '',
+                    },
+                ],
+                wholeText: '',
+            };
+        }
+
         const div = nodes[startDivIdx];
-        const wholeText = div.textContent!.substring(startOffset, endOffset || div.textContent!.length).trim();
+
+        const textContent = div?.textContent || '';
+        const wholeText = textContent.substring(startOffset, endOffset || textContent.length).trim();
         const divTexts = [
             {
                 divIndex: startDivIdx,
                 pageIndex,
-                textContent: div.textContent!,
+                textContent: textContent,
             },
         ];
         return {

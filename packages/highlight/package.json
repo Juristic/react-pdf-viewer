@@ -1,6 +1,6 @@
 {
     "name": "@juristic/react-pdf-viewer-highlight",
-    "version": "3.12.7",
+    "version": "3.12.12",
     "description": "Highlight Plugin for React-pdf-viewer",
     "license": "https://react-pdf-viewer.dev/license",
     "homepage": "https://react-pdf-viewer.dev",
@@ -24,6 +24,7 @@
     "files": [
         "lib/cjs/*.*",
         "lib/styles/*.*",
+        "lib/@types/**/*.*",
         "lib/index.d.ts",
         "lib/index.js"
     ],
