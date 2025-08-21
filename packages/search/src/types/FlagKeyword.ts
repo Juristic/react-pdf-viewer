@@ -12,3 +12,7 @@ export interface FlagKeyword {
     wholeWords?: boolean; // `false` by default
     indexes?: { [pageIndex: string | number]: number[] }; // `{}` by default
 }
+
+export interface Keyword extends Omit<FlagKeyword, 'indexes'> {
+    indexes: Record<string | number, number[]>;
+}
