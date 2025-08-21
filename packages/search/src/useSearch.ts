@@ -17,7 +17,7 @@ import { type SearchTargetPageFilter } from './types/SearchTargetPage';
 import { type StoreProps } from './types/StoreProps';
 import { useDocument } from './useDocument';
 import { SingleKeyword } from './types/SingleKeyword';
-import { FlagKeyword } from './types/FlagKeyword';
+import { Keyword } from './types/FlagKeyword';
 
 export const useSearch = (
     store: Store<StoreProps>,
@@ -39,7 +39,7 @@ export const useSearch = (
         keyword: SingleKeyword[],
         matchCase?: boolean,
         wholeWords?: boolean,
-    ): Promise<{ matches: Match[]; unmatchedKeywords: FlagKeyword[] }>;
+    ): Promise<{ matches: Match[]; unmatchedKeywords: Keyword[] }>;
     setTargetPages(targetPageFilter: SearchTargetPageFilter): void;
     // Compatible with the single keyword search
     keyword: string;
@@ -183,7 +183,7 @@ export const useSearch = (
         keywordParam: SingleKeyword[],
         matchCaseParam?: boolean,
         wholeWordsParam?: boolean,
-    ): Promise<{ matches: Match[]; unmatchedKeywords: FlagKeyword[] }> => {
+    ): Promise<{ matches: Match[]; unmatchedKeywords: Keyword[] }> => {
         const currentDoc = currentDocRef.current;
         if (!currentDoc) {
             return Promise.resolve({ matches: [], unmatchedKeywords: [] });
@@ -216,7 +216,7 @@ export const useSearch = (
 
             getTextPromise.then((response) => {
                 const arr: Match[] = [];
-                const nonMatchingKeywords: Map<string, FlagKeyword> = new Map();
+                const nonMatchingKeywords: Map<string, Keyword> = new Map();
                 response.forEach((pageText, pageIndex) => {
                     if (targetPageFilter()({ pageIndex, numPages })) {
                         keywords.forEach((keyword) => {

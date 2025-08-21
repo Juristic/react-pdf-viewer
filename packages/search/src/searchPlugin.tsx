@@ -34,16 +34,14 @@ import { type SearchTargetPageFilter } from './types/SearchTargetPage';
 import { type StoreProps } from './types/StoreProps';
 import { useSearch } from './useSearch';
 import { SingleKeyword } from './types/SingleKeyword';
-import { FlagKeyword } from './types/FlagKeyword';
+import { Keyword } from './types/FlagKeyword';
 
 export interface SearchPlugin extends Plugin {
     Search(props: SearchProps): React.ReactElement;
     ShowSearchPopover(props: ShowSearchPopoverProps): React.ReactElement;
     ShowSearchPopoverButton(): React.ReactElement;
     clearHighlights(): void;
-    highlight(
-        keyword: SingleKeyword | SingleKeyword[],
-    ): Promise<{ matches: Match[]; unmatchedKeywords: FlagKeyword[] }>;
+    highlight(keyword: SingleKeyword | SingleKeyword[]): Promise<{ matches: Match[]; unmatchedKeywords: Keyword[] }>;
     jumpToMatch(index: number): Match | null;
     jumpToNextMatch(): Match | null;
     jumpToPreviousMatch(): Match | null;
