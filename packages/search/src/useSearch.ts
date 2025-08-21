@@ -17,6 +17,7 @@ import { type SearchTargetPageFilter } from './types/SearchTargetPage';
 import { type StoreProps } from './types/StoreProps';
 import { useDocument } from './useDocument';
 import { SingleKeyword } from './types/SingleKeyword';
+import { FlagKeyword } from './types/FlagKeyword';
 
 export const useSearch = (
     store: Store<StoreProps>,
@@ -34,7 +35,11 @@ export const useSearch = (
     wholeWords: boolean;
     search(): Promise<Match[]>;
     setKeywords(keyword: SingleKeyword[]): void;
-    searchFor(keyword: SingleKeyword[], matchCase?: boolean, wholeWords?: boolean): Promise<Match[]>;
+    searchFor(
+        keyword: SingleKeyword[],
+        matchCase?: boolean,
+        wholeWords?: boolean,
+    ): Promise<{ matches: Match[]; unmatchedKeywords: FlagKeyword[] }>;
     setTargetPages(targetPageFilter: SearchTargetPageFilter): void;
     // Compatible with the single keyword search
     keyword: string;
@@ -112,7 +117,7 @@ export const useSearch = (
         setWholeWords(false);
     };
 
-    const search = () => searchFor(keywords, matchCase, wholeWords);
+    const search = async () => (await searchFor(keywords, matchCase, wholeWords)).matches;
 
     const setKeyword = (keyword: SingleKeyword[] | SingleKeyword) =>
         setKeywords(Array.isArray(keyword) ? keyword : [keyword]);
@@ -178,10 +183,10 @@ export const useSearch = (
         keywordParam: SingleKeyword[],
         matchCaseParam?: boolean,
         wholeWordsParam?: boolean,
-    ): Promise<Match[]> => {
+    ): Promise<{ matches: Match[]; unmatchedKeywords: FlagKeyword[] }> => {
         const currentDoc = currentDocRef.current;
         if (!currentDoc) {
-            return Promise.resolve([]);
+            return Promise.resolve({ matches: [], unmatchedKeywords: [] });
         }
 
         const numPages = currentDoc.numPages;
@@ -211,12 +216,19 @@ export const useSearch = (
 
             getTextPromise.then((response) => {
                 const arr: Match[] = [];
+                const nonMatchingKeywords: Map<string, FlagKeyword> = new Map();
                 response.forEach((pageText, pageIndex) => {
                     if (targetPageFilter()({ pageIndex, numPages })) {
                         keywords.forEach((keyword) => {
+                            if (!keyword.indexes[pageIndex]) {
+                                // We do not expect this keyword on this page
+                                return;
+                            }
+                            const unmatchedIndexesOnPage = keyword.indexes[pageIndex].toReversed();
                             let matchIndex = 0;
                             let matches: RegExpExecArray | null;
                             while ((matches = keyword.regExp.exec(pageText)) !== null) {
+                                unmatchedIndexesOnPage.pop();
                                 if (Object.keys(keyword.indexes || {}).length > 0) {
                                     if (keyword.indexes[pageIndex]?.includes(matchIndex)) {
                                         arr.push({
@@ -242,6 +254,20 @@ export const useSearch = (
                                 }
                                 matchIndex++;
                             }
+                            if (unmatchedIndexesOnPage.length > 0) {
+                                let nonMatchingKeyword = nonMatchingKeywords.get(keyword.keyword);
+                                if (!nonMatchingKeyword) {
+                                    nonMatchingKeyword = {
+                                        keyword: keyword.keyword,
+                                        indexes: {},
+                                        matchCase: true,
+                                    };
+                                    nonMatchingKeywords.set(keyword.keyword, nonMatchingKeyword);
+                                }
+                                if (nonMatchingKeyword?.indexes) {
+                                    nonMatchingKeyword.indexes[pageIndex] = unmatchedIndexesOnPage.reverse();
+                                }
+                            }
                         });
                     }
                 });
@@ -250,8 +276,7 @@ export const useSearch = (
                     setCurrentMatch(1);
                     jumpToGivenMatch(arr[0]);
                 }
-
-                resolve(arr);
+                resolve({ matches: arr, unmatchedKeywords: Array.from(nonMatchingKeywords.values()) });
             });
         });
     };
