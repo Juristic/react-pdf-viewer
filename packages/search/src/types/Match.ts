@@ -18,3 +18,7 @@ export interface Match {
     startIndex: number;
     endIndex: number;
 }
+
+export interface MatchWithExtras<T> extends Match {
+    extras: T | undefined;
+}

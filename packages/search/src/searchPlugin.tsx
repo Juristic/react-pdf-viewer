@@ -26,14 +26,14 @@ import { ShowSearchPopover, ShowSearchPopoverProps } from './ShowSearchPopover';
 import { ShowSearchPopoverButton } from './ShowSearchPopoverButton';
 import { EMPTY_KEYWORD_REGEXP } from './constants';
 import { normalizeSingleKeyword } from './normalizeKeyword';
-import { type Match } from './types/Match';
+import { MatchWithExtras, type Match } from './types/Match';
 import { type NormalizedKeyword } from './types/NormalizedKeyword';
 import { type OnHighlightKeyword } from './types/OnHighlightKeyword';
 import { type RenderHighlightsProps } from './types/RenderHighlightsProps';
 import { type SearchTargetPageFilter } from './types/SearchTargetPage';
 import { type StoreProps } from './types/StoreProps';
 import { useSearch } from './useSearch';
-import { SingleKeyword } from './types/SingleKeyword';
+import { SingleKeyword, SingleKeywordWithExtras } from './types/SingleKeyword';
 import { Keyword } from './types/FlagKeyword';
 
 export interface SearchPlugin extends Plugin {
@@ -41,7 +41,9 @@ export interface SearchPlugin extends Plugin {
     ShowSearchPopover(props: ShowSearchPopoverProps): React.ReactElement;
     ShowSearchPopoverButton(): React.ReactElement;
     clearHighlights(): void;
-    highlight(keyword: SingleKeyword | SingleKeyword[]): Promise<{ matches: Match[]; unmatchedKeywords: Keyword[] }>;
+    highlight<T>(
+        keyword: SingleKeywordWithExtras<T> | SingleKeywordWithExtras<T>[],
+    ): Promise<{ matches: MatchWithExtras<T>[]; unmatchedKeywords: Keyword<T>[] }>;
     jumpToMatch(index: number): Match | null;
     jumpToNextMatch(): Match | null;
     jumpToPreviousMatch(): Match | null;
@@ -164,10 +166,10 @@ export const searchPlugin = (props?: SearchPluginProps): SearchPlugin => {
         clearHighlights: () => {
             clearKeyword();
         },
-        highlight: (keyword: SingleKeyword | SingleKeyword[]) => {
+        highlight: <T,>(keyword: SingleKeywordWithExtras<T> | SingleKeywordWithExtras<T>[]) => {
             const keywords = Array.isArray(keyword) ? keyword : [keyword];
             setKeywords(keywords);
-            return searchFor(keywords);
+            return searchFor<T>(keywords);
         },
         jumpToMatch,
         jumpToNextMatch,

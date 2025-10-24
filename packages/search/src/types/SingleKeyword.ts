@@ -9,3 +9,4 @@
 import { type FlagKeyword } from './FlagKeyword';
 
 export type SingleKeyword = string | RegExp | FlagKeyword;
+export type SingleKeywordWithExtras<T> = string | RegExp | (FlagKeyword & { extras: T | undefined });
