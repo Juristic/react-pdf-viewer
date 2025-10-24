@@ -13,6 +13,9 @@ export interface FlagKeyword {
     indexes?: { [pageIndex: string | number]: number[] }; // `{}` by default
 }
 
-export interface Keyword extends Omit<FlagKeyword, 'indexes'> {
+export interface FlagKeywordWithExtras<T> extends FlagKeyword {
+    extras: T | undefined;
+}
+export interface Keyword<T> extends Omit<FlagKeywordWithExtras<T>, 'indexes'> {
     indexes: Record<string | number, number[]>;
 }

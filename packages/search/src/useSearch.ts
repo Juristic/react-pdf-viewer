@@ -12,12 +12,13 @@ import { getPage, type Store } from '@react-pdf-viewer/core';
 import * as React from 'react';
 import { EMPTY_KEYWORD_REGEXP } from './constants';
 import { normalizeSingleKeyword } from './normalizeKeyword';
-import { type Match } from './types/Match';
+import { MatchWithExtras, type Match } from './types/Match';
 import { type SearchTargetPageFilter } from './types/SearchTargetPage';
 import { type StoreProps } from './types/StoreProps';
 import { useDocument } from './useDocument';
-import { SingleKeyword } from './types/SingleKeyword';
+import { SingleKeyword, SingleKeywordWithExtras } from './types/SingleKeyword';
 import { Keyword } from './types/FlagKeyword';
+import { NormalizedKeyword } from './types/NormalizedKeyword';
 
 export const useSearch = (
     store: Store<StoreProps>,
@@ -34,12 +35,12 @@ export const useSearch = (
     numberOfMatches: number;
     wholeWords: boolean;
     search(): Promise<Match[]>;
-    setKeywords(keyword: SingleKeyword[]): void;
-    searchFor(
-        keyword: SingleKeyword[],
+    setKeywords(keyword: SingleKeywordWithExtras<unknown>[]): void;
+    searchFor<T>(
+        keyword: SingleKeywordWithExtras<T>[],
         matchCase?: boolean,
         wholeWords?: boolean,
-    ): Promise<{ matches: Match[]; unmatchedKeywords: Keyword[] }>;
+    ): Promise<{ matches: MatchWithExtras<T>[]; unmatchedKeywords: Keyword<T>[] }>;
     setTargetPages(targetPageFilter: SearchTargetPageFilter): void;
     // Compatible with the single keyword search
     keyword: string;
@@ -63,7 +64,7 @@ export const useSearch = (
     }, []);
 
     const currentDocRef = useDocument(store);
-    const [keywords, setKeywords] = React.useState<SingleKeyword[]>(initialKeyword);
+    const [keywords, setKeywords] = React.useState<SingleKeywordWithExtras<unknown>[]>(initialKeyword);
     const [found, setFound] = React.useState<Match[]>([]);
     const [currentMatch, setCurrentMatch] = React.useState(0);
     const [matchCase, setMatchCase] = React.useState(normalizedKeywordFlags.matchCase);
@@ -119,7 +120,7 @@ export const useSearch = (
 
     const search = async () => (await searchFor(keywords, matchCase, wholeWords)).matches;
 
-    const setKeyword = (keyword: SingleKeyword[] | SingleKeyword) =>
+    const setKeyword = (keyword: SingleKeywordWithExtras<unknown>[] | SingleKeywordWithExtras<unknown>) =>
         setKeywords(Array.isArray(keyword) ? keyword : [keyword]);
 
     const setTargetPages = (targetPageFilter: SearchTargetPageFilter) => {
@@ -179,25 +180,26 @@ export const useSearch = (
         return keyword.keyword;
     };
 
-    const searchFor = (
-        keywordParam: SingleKeyword[],
+    const searchFor = <T>(
+        keywordParam: SingleKeywordWithExtras<T>[],
         matchCaseParam?: boolean,
         wholeWordsParam?: boolean,
-    ): Promise<{ matches: Match[]; unmatchedKeywords: Keyword[] }> => {
+    ): Promise<{ matches: MatchWithExtras<T>[]; unmatchedKeywords: Keyword<T>[] }> => {
         const currentDoc = currentDocRef.current;
         if (!currentDoc) {
             return Promise.resolve({ matches: [], unmatchedKeywords: [] });
         }
 
         const numPages = currentDoc.numPages;
-        const keywords = keywordParam.map((k) =>
-            normalizeSingleKeyword(
+        const keywords: (NormalizedKeyword & { extras: T | undefined })[] = keywordParam.map((k) => ({
+            ...normalizeSingleKeyword(
                 k,
                 matchCaseParam,
                 wholeWordsParam,
                 k instanceof Object && 'indexes' in k ? k.indexes : undefined,
             ),
-        );
+            extras: k instanceof Object && 'extras' in k ? k.extras : undefined,
+        }));
 
         store.update('keyword', keywords);
 
@@ -215,8 +217,8 @@ export const useSearch = (
                     : Promise.resolve(textContents.current);
 
             getTextPromise.then((response) => {
-                const arr: Match[] = [];
-                const nonMatchingKeywords: Map<string, Keyword> = new Map();
+                const arr: MatchWithExtras<T>[] = [];
+                const nonMatchingKeywords: Map<string, Keyword<T>> = new Map();
                 response.forEach((pageText, pageIndex) => {
                     if (targetPageFilter()({ pageIndex, numPages })) {
                         keywords.forEach((keyword) => {
@@ -239,6 +241,7 @@ export const useSearch = (
                                             pageText,
                                             startIndex: matches.index,
                                             endIndex: keyword.regExp.lastIndex,
+                                            extras: keyword.extras,
                                         });
                                     }
                                 } else {
@@ -250,19 +253,20 @@ export const useSearch = (
                                         pageText,
                                         startIndex: matches.index,
                                         endIndex: keyword.regExp.lastIndex,
+                                        extras: keyword.extras,
                                     });
                                 }
                                 matchIndex++;
                             }
                             if (unmatchedIndexesOnPage.length > 0) {
-                                let nonMatchingKeyword = nonMatchingKeywords.get(keyword.keyword);
+                                const nonMatchingKeyword = nonMatchingKeywords.get(keyword.keyword);
                                 if (!nonMatchingKeyword) {
-                                    nonMatchingKeyword = {
+                                    nonMatchingKeywords.set(keyword.keyword, {
                                         keyword: keyword.keyword,
                                         indexes: {},
                                         matchCase: true,
-                                    };
-                                    nonMatchingKeywords.set(keyword.keyword, nonMatchingKeyword);
+                                        extras: keyword.extras,
+                                    });
                                 }
                                 if (nonMatchingKeyword?.indexes) {
                                     nonMatchingKeyword.indexes[pageIndex] = unmatchedIndexesOnPage.reverse();
